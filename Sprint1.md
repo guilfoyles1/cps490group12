@@ -6,6 +6,7 @@
 
 
 **Use Case #1**
+
 **Use Case Name:** Login
 *Actors:* 
 * User: person interacting with the messenger app
