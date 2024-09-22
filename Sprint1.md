@@ -29,3 +29,7 @@ User interacts with website to initialize login
 
 *Postconditions:*
 * User input correct login information
+
+**Login Sequence Diagram**
+
+<img src="/figures/LoginCommDiagram.drawio.png">
