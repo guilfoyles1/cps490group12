@@ -59,9 +59,9 @@ The user opens the application
 
 *Preconditions:* 
 * Recipient account exists
-  
-*Postcondition:*  
-* Confirmation message (that says that message has been delivered or not)
+* Postconditions: Confirmation message (that says that message has been delivered)
+
+
 
 **Sending a message Sequence Diagram**
 <img src="/figures/ss-capstone1-1.png">
@@ -97,9 +97,10 @@ User sends message
 *Postconditions:* 
 * message is saved in both users’ message history
 
-**Sending a message Sequence Diagram**
+** Sending a message sequence diagram**
 
-<img src="/figures/SendMessageToUser.drawio.png">
+<img src= "/figures/ss-capstone3.png">
+
 
 ## **Use Case #4**
 
