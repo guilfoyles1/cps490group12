@@ -95,7 +95,7 @@ User sends message
 *Postconditions:* 
 * message is saved in both users’ message history
 
-** Sending a message sequence diagram**
+**Sending a message sequence diagram**
 
 <img src= "/figures/ss-capstone3.png">
 
