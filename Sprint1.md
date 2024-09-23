@@ -5,9 +5,10 @@
 #### Abby, Paras, Shay, Zach
 
 
-**Use Case #1**
+## **Use Case #1**
 
 **Use Case Name:** Login
+
 *Actors:* 
 * User: person interacting with the messenger app
 * System
@@ -36,8 +37,12 @@ User interacts with website to initialize login
 <img src="/figures/LoginCommDiagram.drawio.png">
 
 
-**Use Case #2**
+
+
+## **Use Case #2**
+
 **Use Case Name:** Send message
+
 *Actors:* 
 * User
 
@@ -58,8 +63,12 @@ The user opens the application
 * Confirmation message (that says that message has been delivered)
 
 
-**Use Case #3**
+
+
+## **Use Case #3**
+
 **Use Case Name:** Send message to user
+
 *Actors:* 
 * User sending message
 * Recipient
@@ -88,8 +97,12 @@ User sends message
 * message is saved in both users’ message history
 
 
-**Use Case #4**
+
+
+## **Use Case #4**
+
 **Use Case Name:** Receive message
+
 *Actors:* 
 * Sender: The user who sends the message.
 * Recipient: The user who receives the message.
@@ -114,4 +127,12 @@ Another user sends a message to the recipient.
 
 *Postconditions:* 
 * The message is delivered in real-time (or through the notification system if the recipient is offline) and stored in the message history. 
+
+**Receive Message Sequence Diagram**
+<img width="833" alt="Screen Shot 2024-09-22 at 7 37 50 PM" src="https://github.com/user-attachments/assets/b0cf86aa-0e5e-4269-9b25-914c6890cbe2">
+
+
+
+## **Data Flow Diagram**
+<img width="1350" alt="Screen Shot 2024-09-22 at 7 38 38 PM" src="https://github.com/user-attachments/assets/06e38052-c99c-46ab-b7ad-628e6874c5ab">
 
