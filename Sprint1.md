@@ -133,6 +133,27 @@ Another user sends a message to the recipient.
 
 
 
-## **Data Flow Diagram**
-<img width="1350" alt="Screen Shot 2024-09-22 at 7 38 38 PM" src="https://github.com/user-attachments/assets/06e38052-c99c-46ab-b7ad-628e6874c5ab">
+## **Activity Flow Diagrams**
+
+**Use Case 4**
+<img width="381" alt="Screen Shot 2024-09-23 at 6 21 13 PM" src="https://github.com/user-attachments/assets/2797966e-eb23-4249-99cb-76bd01cbd88f">
+
+
+
+
+## **Trello Progress Screen Shots**
+
+**Beginning**
+<img width="1206" alt="Beginning Trello Board SC" src="https://github.com/user-attachments/assets/dc45b46b-03fb-4a4b-9145-15fa8de11cdb">
+
+
+**Middle**
+<img width="1440" alt="Screen Shot 2024-09-17 at 1 40 08 PM" src="https://github.com/user-attachments/assets/c3dac892-6d6d-413f-985d-e9769549d3fd">
+
+
+**End**
+
+
+
+
 
