@@ -59,7 +59,9 @@ The user opens the application
 
 *Preconditions:* 
 * Recipient account exists
-* Postconditions: Confirmation message (that says that message has been delivered)
+
+*Postconditions:*
+* Confirmation message (that says that message has been delivered)
 
 **Sending a message sequence diagram**
 
@@ -67,6 +69,8 @@ The user opens the application
 
 **Sending a message Sequence Diagram**
 <img src="/figures/ss-capstone1-1.png">
+
+
 
 ## **Use Case #3**
 
