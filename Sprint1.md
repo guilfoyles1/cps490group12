@@ -59,10 +59,10 @@ The user opens the application
 
 *Preconditions:* 
 * Recipient account exists
-* Postconditions: 
-* Confirmation message (that says that message has been delivered)
+*Postcondition:*  
+* Confirmation message (that says that message has been delivered or not)
 
-
+**Sending a message Sequence Diagram**
 
 
 ## **Use Case #3**
