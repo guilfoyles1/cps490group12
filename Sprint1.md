@@ -168,6 +168,7 @@ Another user sends a message to the recipient.
 
 **End**
 
+<img src="/figures/ss-capstone-trelloend.png">
 
 
 
