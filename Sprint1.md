@@ -140,6 +140,8 @@ Another user sends a message to the recipient.
 
 
 **Use Case 2**
+
+
 <img src="/figures/ss-capstone activity.png">
 
 **Use Case 3**
