@@ -61,7 +61,9 @@ The user opens the application
 * Recipient account exists
 * Postconditions: Confirmation message (that says that message has been delivered)
 
+**Sending a message sequence diagram**
 
+<img src= "/figures/ss-capstone3.png">
 
 
 ## **Use Case #3**
@@ -95,9 +97,9 @@ User sends message
 *Postconditions:* 
 * message is saved in both users’ message history
 
-**Sending a message sequence diagram**
+**Send message to user sequence diagram**
 
-<img src= "/figures/ss-capstone3.png">
+<img src= "/figures/SendMessageToUserSequenceDiagram.png">
 
 
 ## **Use Case #4**
