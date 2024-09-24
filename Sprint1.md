@@ -59,6 +59,7 @@ The user opens the application
 
 *Preconditions:* 
 * Recipient account exists
+  
 *Postcondition:*  
 * Confirmation message (that says that message has been delivered or not)
 
