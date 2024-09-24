@@ -98,6 +98,7 @@ User sends message
 * message is saved in both users’ message history
 
 **Sending a message Sequence Diagram**
+
 <img src="/figures/SendMessageToUser.drawio.png">
 
 ## **Use Case #4**
@@ -138,6 +139,7 @@ Another user sends a message to the recipient.
 
 **Use Case 1**
 
+<img src="/figures/LoginActivityDiagram.drawio.png">
 
 **Use Case 2**
 
