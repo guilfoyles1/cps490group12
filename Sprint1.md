@@ -63,7 +63,7 @@ The user opens the application
 * Confirmation message (that says that message has been delivered or not)
 
 **Sending a message Sequence Diagram**
-
+<img src="/figures/ss-capstone1-1png">
 
 ## **Use Case #3**
 
