@@ -63,13 +63,6 @@ The user opens the application
 *Postcondition:*  
 * Confirmation message (that says that message has been delivered or not)
 
-**Sending a message sequence diagram**
-
-<img src= "/figures/ss-capstone3.png">
-
-
-
-
 **Sending a message Sequence Diagram**
 <img src="/figures/ss-capstone1-1png">
 >>>>>>> 72dce1d (Update Sprint1.md)
@@ -105,10 +98,8 @@ User sends message
 *Postconditions:* 
 * message is saved in both users’ message history
 
-**Send message to user sequence diagram**
-
-<img src= "/figures/SendMessageToUserSequenceDiagram.png">
-
+**Sending a message Sequence Diagram**
+<img src="/figures/SendMessageToUser.drawio.png">
 
 ## **Use Case #4**
 
@@ -156,6 +147,7 @@ Another user sends a message to the recipient.
 
 **Use Case 3**
 
+<img src="/figures/Send message to user-Activity flow.drawio.png">
 
 **Use Case 4**
 
