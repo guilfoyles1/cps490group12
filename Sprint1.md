@@ -146,6 +146,15 @@ Another user sends a message to the recipient.
 
 ## **Activity Flow Diagrams**
 
+**Use Case 1**
+
+
+**Use Case 2**
+
+
+**Use Case 3**
+
+
 **Use Case 4**
 <img width="381" alt="Screen Shot 2024-09-23 at 6 21 13 PM" src="https://github.com/user-attachments/assets/2797966e-eb23-4249-99cb-76bd01cbd88f">
 
