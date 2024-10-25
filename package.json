@@ -1,0 +1,11 @@
+{
+  "name": "cps490group12",
+  "version": "1.0.0",
+  "description": "Messenger App for Capstone 1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abby Foppe, Shay Guilfoyle, Paras Rajan, Zach Spears",
+  "license": "ISC"
+}
