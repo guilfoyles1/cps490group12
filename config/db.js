@@ -1,7 +1,7 @@
 //DB info
 const uname = "admin";
 const pword = "CapstoneG12Admin!";
-const cluster = "capstone-1-app"
+const cluster = "capstone-1-app.ynepw"
 const dbname = ""; //defaults to "test" if left blank
 
 //Login to DB
