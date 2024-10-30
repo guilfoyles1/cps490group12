@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const upload = multer();
+//const session = require('express-session');
 
 const db = require('./config/db');
 
@@ -22,7 +23,7 @@ const router = require('./routes');
 app.use('/', router);
 
 //Run application
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

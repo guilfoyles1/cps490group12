@@ -4,6 +4,35 @@ const router = require("express").Router();
 
 
 //GET & POST for Signup
+router.get('/signup', (req, res) => {  //signup get request
+    res.render('signup');
+});
+router.post('/signup', async (req, res) => { //signup Post request //debugging
+    if(!req.body.name || !req.body.password || !req.body.email || !req.body.username){ //make sure all boxes filled in
+        res.render('signup', {message: "Please enter both name, username, email, and password!"});
+        return;    
+    }
+    const user = Users.find( (element) => {
+        return element.username === req.body.username ;
+    });
+
+    // const userExists = asynce(uname) => {
+
+    // }
+    if (await Users.exists({username: req.body.username}))
+
+    console.log("<Signup> Find: ", user);
+    if (user === undefined || user === null) {
+        let newUser = {name: req.body.name, password: req.body.password, email: req.body.email, username: req.body.username}; 
+        Users.push(newUser);
+        req.session.user = newUser;
+        res.redirect('/protected_page'); 
+        return;     //create new user, proceed to protected page
+    } else {
+        res.render('signup', { message: "User Already Exists! Login or choose another user id"});
+        return;
+    }
+});
 
 
 //GET & POST for Login

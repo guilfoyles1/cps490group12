@@ -66,6 +66,17 @@ const getUser = async (req, res) => {
     }
 };
 
+//check sign in
+const checkSignIn = (req, res, next) => {
+    if(req.session.user){
+        return next();      //If session exists, proceed to page
+    } else {
+        const err = new Error("Not logged in!");
+        err.status = 400;
+        return next(err);   //Error, trying to access unauthorized page!
+    }
+};
+
 // Not sure how to do this yet, user should be able to
 // Change Uname, Email, and pass just not all at the same time
 // So these three functions should be split up
