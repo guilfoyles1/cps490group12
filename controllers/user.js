@@ -6,33 +6,10 @@
 // login/signup/forgot password routes, while other .js files can
 // handle other various routes
 
+const User = require('../models/users');
 
-//My APIs for dealing with candy
-const User = require('../models/user');
-
-// const dropCandy = async () => {
-//     return await Promise.all([Candy.deleteMany({})]);
-// };
-
-// const seedCandy = async () => {
-//     const candy1 = new Candy({company: "Hershey", brand: "Reece's Pieces", quantity: 5});
-//     const candy2 = new Candy({company: "Hershey", brand: "5th Avenue", quantity: 10});
-//     const candy3 = new Candy({company: "Hershey", brand: "York Peppermint Patties", quantity: 11});
-//     const candy4 = new Candy({company: "Mars", brand: "Snickers", quantity: 2});
-//     const candy5 = new Candy({company: "Mars", brand: "Twix", quantity: 7});
-//     await candy1.save();
-//     await candy2.save();
-//     await candy3.save();
-//     await candy4.save();
-//     await candy5.save();
-// };
-
-// dropCandy().then( () => {
-//     seedCandy();
-// });
-
-const userExists = async (uname, email) => {
-    query = {user: uname, email: email};
+const userExists = async (username, email) => {
+    query = {user: username, email: email};
     return await User.exists(query);
 };
 
@@ -40,12 +17,13 @@ const userExists = async (uname, email) => {
 const createUser = async (req, res) => {
     try {
         //Get the user info from the request body
-        const candyData = await req.body;
+        const userData = await req.body;
         console.log(`This is the data: ${JSON.stringify(userData)}`);
 
-        let uname = candyData.uname;
-        let email = candyData.email;
-        let password = candyData.password; 
+        let pname = userData.name
+        let uname = userData.username;
+        let email = userData.email;
+        let password = userData.password; 
 
         if (await candyExists(uname, email)) {
             res.status(400).json({ success: false, message: "User already exists!" });
@@ -70,7 +48,7 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
-        let uname = req.params.uname
+        let uname = req.params.username
         let email = req.params.email
         let query = {user: uname, email: email};
 
@@ -116,7 +94,7 @@ const getUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        let uname = req.params.uname
+        let uname = req.params.username
         let email = req.params.email
         let query = {user: uname, email: email};
         
@@ -149,4 +127,4 @@ const getAllUser = async (req, res) => {
     }
 };
 
-module.exports = {createUser, getUser, deleteUser, /*updateCandy,*/ getAllUser};
+module.exports = {userExists, createUser, getUser, deleteUser, /*updateCandy,*/ getAllUser};

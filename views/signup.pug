@@ -5,6 +5,8 @@ html
         if(message)
             h4 #{message}
         form(action = "/signup" method = "POST")
-            input(name = "id" type = "text" required placeholder = "User ID")
+            input(name = "name" type = "text" required placeholder = "Name")
+            input(name = "username" type = "text" required placeholder = "Username")
+            input(name = "email" type = "text" required placeholder = "Email")
             input(name = "password" type = "password" required placeholder = "Password")
             button(type = "Submit") Sign up!

@@ -1,27 +1,20 @@
 const router = require("express").Router();
-//const userController = require("../controllers/user");
+const userRouter = require("./routes/accounts");
 
 //C for Create: HTTP POST
 //R for Read: HTTP GET
 //U for Update: HTTP PUT
 //D for Delete: HTTP DELETE
 
-//Set PUG use
-// router.set('view engine', 'pug');
-// router.set('views', './views');
 
-//Handle the get route
+//Handle '/' loading home page
 router.get("/", (req, res) => {
     res.render('home_page');
 });
 
-//Handle the post route
-
-
-//Handle the put route
-
-
-//Handle the delete route
+//Tell routes.js to use accounts.js for handling
+//user account info
+router.use('/', userRouter);
 
 
 module.exports = router;
