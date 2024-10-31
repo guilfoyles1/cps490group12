@@ -2,13 +2,16 @@ doctype html
 html
     head
         title Protected Page
-    body
-        header
-            h1 Welcome, #{name}!
-            p How are you doing today?
+        link(rel="stylesheet", href="/styles.css")
 
-        main
-            section
-                h2 Options
-                p Want to log out?
-                a(href="/logout") Logout
+    body
+        .container        
+            header
+                h1 Welcome, #{name}!
+                p How are you doing today?
+
+            main
+                section
+                    h2 Options
+                    p Want to log out?
+                    a(href="/logout") Logout
