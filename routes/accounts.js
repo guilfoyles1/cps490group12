@@ -1,93 +1,99 @@
 const userController = require("../controllers/user");
-const Users = require("../models/users");
+const Users = require("../models/users"); // Import the User model
+const bcrypt = require('bcrypt'); // Import bcrypt
 const router = require("express").Router();
 
-
-//GET & POST for Signup
-router.get('/signup', (req, res) => {  //signup get request
+// GET & POST for Signup
+router.get('/signup', (req, res) => { // Signup GET request
     res.render('signup');
 });
-router.post('/signup', async (req, res) => { //signup Post request //debugging
-    if(!req.body.name || !req.body.password || !req.body.email || !req.body.username){ //make sure all boxes filled in
-        res.render('signup', {message: "Please enter both name, username, email, and password!"});
-        return;    
+
+router.post('/signup', async (req, res) => { // Signup POST request
+    const { name, username, email, password } = req.body;
+
+    if (!name || !username || !email || !password) {
+        return res.render('signup', { message: "Please enter both name, username, email, and password!" });
     }
-    const user = Users.find( (element) => {
-        return element.username === req.body.username ;
-    });
 
-    // const userExists = asynce(uname) => {
+    const userExists = await Users.exists({ username });
+    if (userExists) {
+        return res.render('signup', { message: "User already exists! Login or choose another username." });
+    }
 
-    // }
-    if (await Users.exists({username: req.body.username}))
+    // Hash the password for security
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log("<Signup> Find: ", user);
-    if (user === undefined || user === null) {
-        let newUser = {name: req.body.name, password: req.body.password, email: req.body.email, username: req.body.username}; 
-        Users.push(newUser);
-        req.session.user = newUser;
-        res.redirect('/protected_page'); 
-        return;     //create new user, proceed to protected page
-    } else {
-        res.render('signup', { message: "User Already Exists! Login or choose another user id"});
-        return;
+    // Create a new user object
+    const newUser = {
+        name,
+        username,
+        email,
+        password, // Store password
+    };
+
+    try {
+        const createdUser = await Users.create(newUser);
+        req.session.user = createdUser; // Set the session user
+        res.redirect('/protected_page'); // Redirect to protected page
+    } catch (error) {
+        console.error(error);
+        res.status(500).render('signup', { message: "Internal server error while creating user." });
     }
 });
 
-
-//GET & POST for Login
-//Get /login
+// GET & POST for Login
 router.get('/login', (req, res) => {
     res.render('login');
 });
 
-//Post /login
 router.post('/login', async (req, res) => {
-    var userInfo = await req.body; //Get parsed info
-    if(!userInfo.username || !userInfo.password) {
-        res.render('login', {message: "Please enter all both username and password!"});
+    const { username, password } = req.body; 
+    if (!username || !password) {
+        res.render('login', { message: "Please enter both username and password!" });
         return;
     }
 
-    const user = await Users.findOne({ username: req.body.username });
+    const user = await Users.findOne({ username });
+    if (!user) {
+        return res.render('login', { message: "User does not exist!" });
+    }
 
-    if (user) {
-        if (user.password == userInfo.password) {
-            req.session.user = user;
-            console.log(`${user.id} logged in.`);
-            res.redirect('/protected_page');
-        } else {
-            res.render('login', {message: "Invalid credentials!"});
-            return;
-        }
+    // Validate password using bcrypt
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+        req.session.user = user;
+        console.log("Session after login:", req.session);
+        console.log(`${user.id} logged in.`);
+        res.redirect('/protected_page');
     } else {
-        res.render('login', {message: "User does not exist!"});
+        return res.render('login', { message: "Invalid credentials!" });
     }
 });
 
-//Get /logout
+// GET /logout
 router.get('/logout', (req, res) => {
-    let user = req.session.user.username;
-    req.session.destroy( () => {
-        console.log(`${user} logged out.`)
-    });
-    res.redirect('/login');
+    const username = req.session.user.username;
+    req.session.destroy(() => {
+        console.log(`${username} logged out.`);
+        res.redirect('/login');
+    });   
 });
 
-//Get /protected_page
+// GET /protected_page
 router.get('/protected_page', (req, res) => {
-    res.render('protected_page', {id: req.session.user.id})
+    console.log("Accessing protected page - Session data:", req.session);
+    if (!req.session.user) { // Check if user is logged in
+        return res.redirect('/login'); // Redirect to login if not
+    }
+    res.render('protected_page', { name: req.session.user.name }); // Passing 'name' instead of 'id'
 });
 
-router.use('/protected_page', (err, req, res, next) => {
+// Error handling middleware for protected page
+router.use((err, req, res, next) => {
+    console.error("Error accessing protected page:", err);
     res.redirect('/login');
 });
 
-//GET & POST for Forgot Uname
-// - input email to retreive uname
-
-
-//GET & POST for Forgot Pass
-// - input uname/email to recover pass
+// GET & POST for Forgot Username and Password functionality (if needed)
 
 module.exports = router;

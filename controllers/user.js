@@ -1,141 +1,198 @@
-// I'm thinking similar to CandyLand controller,
-// where this file contains the functions to alter the
-// DB rather than having pug/html files do it directly.
-// These functions can be called by various routes in '/routes'
-// I imagined using 'accounts.js' to handle
-// login/signup/forgot password routes, while other .js files can
-// handle other various routes
-
+const bcrypt = require('bcrypt');
 const User = require('../models/users');
 
+// Helper function to check if a user exists
 const userExists = async (username, email) => {
-    query = {user: username, email: email};
+    const query = { username: username, email: email };
     return await User.exists(query);
 };
 
-//Request Handling
-const createUser = async (req, res) => {
-    try {
-        //Get the user info from the request body
-        const userData = await req.body;
-        console.log(`This is the data: ${JSON.stringify(userData)}`);
-
-        let pname = userData.name
-        let uname = userData.username;
-        let email = userData.email;
-        let password = userData.password; 
-
-        if (await candyExists(uname, email)) {
-            res.status(400).json({ success: false, message: "User already exists!" });
-            return;
-        }
-
-        //Create a new task then save
-        let db_data = {uname: uname, email: email, password: password};
-        await User.create(db_data).then( (createUser) => {
-            if (!createdUser)
-                return res.status(404).json({ sucesss: false, message: "User creation failed", error: "Unable to get User" });
-            //201 -- Created success status
-            res.status(201).json({ success: true, createdUser });
-        })
-        .catch( (error) => {
-            res.status(404).json({ success: false, error: error.message });
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error"});
-    }
-};
-
-const getUser = async (req, res) => {
-    try {
-        let uname = req.params.username
-        let email = req.params.email
-        let query = {user: uname, email: email};
-
-        await User.findOne(query).then( (foundUser) => {
-            if (!foundUser)
-                return res.status(404).json({sucess: false, message: "User retrieval failed", error: "Unable to retrieve User"});
-            //201 -- created success status
-            res.status(201).json({success: true, foundUser});
-        })
-        .catch( (error) => {
-            res.status(404).json({ success: false, error: error.message});
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error"});
-    }
-};
-
-//check sign in
+// Middleware to check if the user is signed in
 const checkSignIn = (req, res, next) => {
-    if(req.session.user){
-        return next();      //If session exists, proceed to page
+    if (req.session.user) {
+        return next(); // If session exists, proceed to the next middleware
     } else {
         const err = new Error("Not logged in!");
-        err.status = 400;
-        return next(err);   //Error, trying to access unauthorized page!
+        err.status = 401; // Unauthorized status code
+        return next(err); // Pass the error to the error handling middleware
     }
 };
 
-// Not sure how to do this yet, user should be able to
-// Change Uname, Email, and pass just not all at the same time
-// So these three functions should be split up
+// Request Handling
 
-// const updateCandy = async (req, res) => {
-//     try {
-//         let cname = req.params.company;
-//         let bname = req.params.brand;
-//         let num = req.params.quanity;
-//         let query = {company: cname, brand: bname};
-//         let update = {quanity: num};
+// Create a new user
+const createUser = async (req, res) => {
+    try {
+        const { name, username, email, password } = req.body;
+
+        // Check if the user already exists
+        if (await userExists(username, email)) {
+            return res.status(400).json({ success: false, message: "User already exists!" });
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
         
-//         await Candy.findOneAndUpdate(query, update, {new:true}).then( (foundCandy) => {
-//             if (!foundCandy)
-//                 return res.status(404).json({ success: false, message: "Candy update failed", error: "Unable to locate Candy"});
-//             //201 -- Update success status
-//             res.status(201).json({ success: true, foundCandy });
-//         })
-//         .catch( (error) => {
-//             res.status(404).json({ success: false, error: error.message });
-//         });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: "Internal server error"});
-//     }
-// };
+        // Create a new user and save to the database
+        const db_data = { name, username, email, password: hashedPassword };
+        const createdUser = await User.create(db_data);
+        if (!createdUser) {
+            return res.status(404).json({ success: false, message: "User creation failed" });
+        }
 
+        res.status(201).json({ success: true, createdUser });
+    } catch (error) {
+        console.error(error); // Log the error for debugging
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Login a user
+const loginUser = async (req, res) => {
+    try {
+        const { username, password } = req.body; // Get the username and password from the request body
+
+        // Find the user by username
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).json({ success: false, message: "Invalid Credentials" });
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ success: false, message: "Invalid Credentials" });
+        }
+
+        // If successful, set the session and return a success response
+        req.session.user = { id: user._id, username: user.username };
+        res.status(200).json({ success: true, message: "Login successful!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Get a user by username and email
+const getUser = async (req, res) => {
+    try {
+        const { username, email } = req.params;
+        const query = { username, email };
+
+        const foundUser = await User.findOne(query);
+        if (!foundUser) {
+            return res.status(404).json({ success: false, message: "User retrieval failed" });
+        }
+        res.status(200).json({ success: true, foundUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Function to update the user's username
+const updateUsername = async (req, res) => {
+    try {
+        const { newUsername } = req.body; // Get the new username from the request body
+        const userId = req.session.user.id;
+
+        // Check if the new username already exists
+        const usernameExists = await User.exists({ username: newUsername });
+        if (usernameExists) {
+            return res.status(400).json({ success: false, message: "Username is already taken!" });
+        }
+
+        // Update the user's username
+        const updatedUser = await User.findByIdAndUpdate(userId, { username: newUsername }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User not found!" });
+        }
+
+        res.status(200).json({ success: true, updatedUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Function to update the user's email
+const updateEmail = async (req, res) => {
+    try {
+        const { newEmail } = req.body; // Get the new email from the request body
+        const userId = req.session.user.id;
+
+        // Check if the new email already exists
+        if (await User.exists({ email: newEmail })) {
+            return res.status(400).json({ success: false, message: "Email is already taken!" });
+        }
+
+        // Update the user's email
+        const updatedUser = await User.findByIdAndUpdate(userId, { email: newEmail }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User not found!" });
+        }
+
+        res.status(200).json({ success: true, updatedUser });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Function to update the user's password
+const updatePassword = async (req, res) => {
+    try {
+        const { newPassword } = req.body; // Get the new password from the request body
+        const userId = req.session.user.id;
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password
+        const updatedUser = await User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User not found!" });
+        }
+
+        res.status(200).json({ success: true, message: "Password updated successfully." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
+
+// Delete a user
 const deleteUser = async (req, res) => {
     try {
-        let uname = req.params.username
-        let email = req.params.email
-        let query = {user: uname, email: email};
-        
-        await User.findOneAndDelete(query).then( (foundUser) => {
-            if (!foundUser)
-                return res.status(404).json({ success: false, message: "User deletion failed", error: "Unable to locate User"});
-            //201 -- Update success status
-            res.status(201).json({ success: true, foundUser });
-        })
-        .catch( (error) => {
-            res.status(404).json({ success: false, error: error.message });
-        });
+        const { username, email } = req.params;
+        const query = { username, email };
+
+        const deletedUser = await User.findOneAndDelete(query);
+        if (!deletedUser) {
+            return res.status(404).json({ success: false, message: "User deletion failed" });
+        }
+        res.status(200).json({ success: true, message: "User deleted successfully." });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error"});
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
 
-const getAllUser = async (req, res) => {
-    //Get all the data in the model and return it as response
+// Get all users
+const getAllUsers = async (req, res) => {
     try {
-        User.find().sort('-date').then( (allUsers) => {
-            console.log(allUsers);
-            res.status(200).render('all',{ success: true, allUsers});
-        })
-        .catch( (error) => {
-            res.status(404).json({ success: false, message: "Can't find ", error });
-        });
+        const allUsers = await User.find().sort('-date');
+        res.status(200).json({ success: true, allUsers });
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal server error", error: error.message });
     }
 };
 
-module.exports = {userExists, createUser, getUser, deleteUser, /*updateCandy,*/ getAllUser};
+// Export functions
+module.exports = {
+    userExists,
+    createUser,
+    loginUser,
+    getUser,
+    updateUsername,
+    updateEmail,
+    updatePassword,
+    deleteUser,
+    getAllUsers,
+    checkSignIn
+};

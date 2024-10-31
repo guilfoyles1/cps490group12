@@ -1,12 +1,69 @@
 html
     head
         title Signup
+        style.
+            .error-box {
+                display: none;
+                background-color: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+                padding: 10px;
+                margin-top: 5px;
+                border-radius: 4px;
+                position: absolute;
+                z-index: 1000;
+            }
+            .input-error {
+                border: 1px solid #dc3545; /* Bootstrap danger color */
+            }
     body
-        if(message)
+        if message
             h4 #{message}
-        form(action = "/signup" method = "POST")
-            input(name = "name" type = "text" required placeholder = "Name")
-            input(name = "username" type = "text" required placeholder = "Username")
-            input(name = "email" type = "text" required placeholder = "Email")
-            input(name = "password" type = "password" required placeholder = "Password")
-            button(type = "Submit") Sign up!
+        form(id="signupForm" action="/signup" method="POST")
+            input(name="name" type="text" required placeholder="Name")
+            input(name="username" type="text" required placeholder="Username")
+            input(name="email" type="text" required placeholder="Email")
+            input(name="password" type="password" required placeholder="Password" minlength="8")
+            button(type="submit") Sign up!
+            div(id="error-message" class="error-box") Please fill out all fields correctly.
+
+        script.
+            const form = document.getElementById('signupForm');
+            const errorMessage = document.getElementById('error-message');
+
+            form.addEventListener('submit', function (event) {
+                let isValid = true; // Assume the form is valid initially
+
+                // Check if all required fields are filled
+                const inputs = form.querySelectorAll('input[required]');
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        isValid = false;
+                        input.classList.add('input-error'); // Highlight error
+                    } else {
+                        input.classList.remove('input-error'); // Remove error highlight if valid
+                    }
+                });
+
+                // Check for password length
+                const passwordInput = form.querySelector('input[name="password"]');
+                if (passwordInput.value.length < 8) {
+                    isValid = false;
+                    passwordInput.classList.add('input-error');
+                }
+
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission
+                    errorMessage.style.display = 'block'; // Show error message
+                } else {
+                    errorMessage.style.display = 'none'; // Hide error message if valid
+                }
+            });
+
+            // Hide the error message when user hovers over the input
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('mouseover', function () {
+                    errorMessage.style.display = 'none'; // Hide error message on hover
+                });
+            });

@@ -1,9 +1,14 @@
+doctype html
 html
     head
         title Protected Page
     body
-        div Hey #{id}, How are you doing today?
-        div Want to log out?
-        div
-            p
+        header
+            h1 Welcome, #{name}!
+            p How are you doing today?
+
+        main
+            section
+                h2 Options
+                p Want to log out?
                 a(href="/logout") Logout

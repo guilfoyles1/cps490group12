@@ -4,7 +4,7 @@ html
     body
         if(message)
             h4 #{message}
-        form(action = "/login" method = "POST")
-            input(name = "username" type = "text" required placeholder = "Username")
-            input(name = "password" type = "password" required placeholder = "Password")
-            button(type = "Submit") Log in
+        form(action="/login" method="POST")
+            input(name="username" type="text" required placeholder="Username")
+            input(name="password" type="password" required placeholder="Password")
+            button(type="submit") Log in
