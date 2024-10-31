@@ -7,8 +7,11 @@ const session = require('express-session');
 
 const db = require('./config/db');
 
+
 app.set('view engine', 'pug');
 app.set('views', './views');
+//set up static middleware
+app.use('/', express.static('public'))
 
 //For parsing application/json
 app.use(bodyParser.json());
