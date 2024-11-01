@@ -12,18 +12,26 @@ html
 
             main
                 section
-                    h2 Not Implemented Yet
                     if message
                         p.alert #{message}
+                    br
+
+                    // Username Update Form
                     form(action="/update-username" method="POST")
                         label(for="newUsername") New Username:
                         input(type="text" name="newUsername" required)
                         button(type="submit") Update Username
+                    br
+
+                    // Email update Form
                     form(action="/update-email" method="POST")
                         label(for="newEmail") New Email:
                         input(type="text" name="newEmail" required)
                         button(type="submit") Update Email
+                    br
+
+                    // Password Update Form
                     form(action="/update-password]" method="POST")
-                        label(for="newPassword") New Email:
+                        label(for="newPassword") New Password:
                         input(type="text" name="newPassword" required)
                         button(type="submit") Update Password

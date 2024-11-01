@@ -12,7 +12,7 @@ router.post('/signup', async (req, res) => { // Signup POST request
     const { name, username, email, password } = req.body;
 
     if (!name || !username || !email || !password) {
-        return res.render('signup', { message: "Please enter both name, username, email, and password!" });
+        return res.render('signup', { message: "Please enter name, username, email, and password!" });
     }
 
     const userExists = await Users.exists({ username });
@@ -22,13 +22,14 @@ router.post('/signup', async (req, res) => { // Signup POST request
 
     // Hash the password for security
     const hashedPassword = await bcrypt.hash(password, 10);
+    //const newUser = { name, username, email, password: hashedPassword };
 
     // Create a new user object
     const newUser = {
         name,
         username,
         email,
-        password, // Store password
+        password: hashedPassword // Store password
     };
 
     try {
@@ -37,7 +38,7 @@ router.post('/signup', async (req, res) => { // Signup POST request
         res.redirect('/protected_page'); // Redirect to protected page
     } catch (error) {
         console.error(error);
-        res.status(500).render('signup', { message: "Internal server error while creating user." });
+        res.status(500).render('signup', { message: "Error while creating user." });
     }
 });
 

@@ -19,7 +19,9 @@ html
                 border: 1px solid #dc3545; /* Bootstrap danger color */
             }
     body
-        .container    
+        .container  
+            header
+                h1(style="color:purple") Sign Up  
             if message
                 h4 #{message}
             form(id="signupForm" action="/signup" method="POST")
