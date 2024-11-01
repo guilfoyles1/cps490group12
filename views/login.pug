@@ -4,6 +4,8 @@ html
         link(rel="stylesheet", href="/styles.css")
     body
         .container
+            header
+                h1(style="color:purple") Log In
             if(message)
                 h4 #{message}
             form(action="/login" method="POST")
