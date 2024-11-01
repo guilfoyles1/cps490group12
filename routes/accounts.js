@@ -95,5 +95,12 @@ router.use((err, req, res, next) => {
 });
 
 // GET & POST for Forgot Username and Password functionality (if needed)
+router.get('/update_user', (req, res) => {
+    console.log("Accessing update user page = Session data: ", req.session);
+    if (!req.session.user) { //Check if logged in
+        return res.redirect('/login');    
+    }
+    res.render('update_user');
+});
 
 module.exports = router;
