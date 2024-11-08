@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const userRouter = require("./routes/accounts");
+const userRouter = require("./src/routes/accounts");
 
 // C for Create: HTTP POST
 // R for Read: HTTP GET

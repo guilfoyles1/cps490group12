@@ -1,5 +1,5 @@
-const userController = require("../controllers/user");
-const Users = require("../models/users"); // Import the User model
+const userController = require("../../controllers/user");
+const Users = require("../../models/users"); // Import the User model
 const bcrypt = require('bcrypt'); // Import bcrypt
 const router = require("express").Router();
 
