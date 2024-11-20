@@ -5,8 +5,16 @@ const multer = require('multer');
 const upload = multer();
 const session = require('express-session');
 
-const db = require('./config/db');
+// //Require http and socket.io
+// const io = require("socket.io");
+// const http = require("http").Server(app);
 
+// //Adding event listeners to http instance
+// const socket = io(http);
+
+//Load configs
+const db = require('./config/db');
+const socketConfig = require('./config/socket');
 
 app.set('view engine', 'pug');
 app.set('views', './views');

@@ -1,5 +1,6 @@
 const router = require("express").Router();
-const userRouter = require("./src/routes/accounts");
+const userRouter = require("../src/routes/accounts");
+const messageRouter = require("../src/routes/message");
 
 // C for Create: HTTP POST
 // R for Read: HTTP GET
@@ -11,8 +12,12 @@ router.get("/", (req, res) => {
     res.render('home_page');
 });
 
+
 // Tell routes.js to use accounts.js for handling user account info
 router.use('/', userRouter);
+
+//Adds message routes
+router.use('/', messageRouter);
 
 // General error handling middleware
 router.use((err, req, res, next) => {
