@@ -5,16 +5,14 @@ const multer = require('multer');
 const upload = multer();
 const session = require('express-session');
 
-// //Require http and socket.io
-// const io = require("socket.io");
-// const http = require("http").Server(app);
+// SocketIO Loader
+const { createServer } = require('http');
+const server = createServer(app);
+const socket = require('./config/socket');
+socket(server);
 
-// //Adding event listeners to http instance
-// const socket = io(http);
-
-//Load configs
+// Database Loader
 const db = require('./config/db');
-const socketConfig = require('./config/socket');
 
 app.set('view engine', 'pug');
 app.set('views', './views');
@@ -43,6 +41,6 @@ app.use('/', router);
 
 //Run application
 const port = process.env.PORT || 3001;
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

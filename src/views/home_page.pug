@@ -14,3 +14,9 @@ html
                 br
                 button(type="button" style="margin-right: 10px;" onClick="window.location.href = '/signup';") Signup
                 button(type="button" onClick="window.location.href = '/login';") Login
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io();
+        socket.on('connect', () => {
+            console.log('Connected to server via Socket.IO');
+        });

@@ -47,4 +47,8 @@ router.post('/chatrooms', async (req, res) => {
     }
 });
 
+router.get('/global', (req, res) => {
+    res.render('global');
+});
+
 module.exports = router;
