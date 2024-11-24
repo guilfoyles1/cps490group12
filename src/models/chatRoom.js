@@ -9,7 +9,7 @@ const ChatRoomSchema = new Schema(
      }, // Optional for 1-to-1 chats
       type: { 
         type: String,
-        enum: ['one-to-one', 'group', 'global'],
+        enum: ['one_to_one', 'group', 'global'],
         required: true
     }, // Define chat type
       users: [{ 

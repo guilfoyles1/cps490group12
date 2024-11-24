@@ -5,6 +5,34 @@ html
     // Include the above in your HEAD tag
     link(href="../public/styles.css" type="text/css" rel="stylesheet")
   body
+    form#create-room-form
+    input#usernames(type="text" placeholder="Enter usernames, separated by commas")
+    button(type="submit") Create Room
+
+script.
+    const form = document.getElementById('create-room-form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const usernames = document.getElementById('usernames').value.split(',').map(u => u.trim());
+        if (usernames.length === 0) return alert('Enter at least one username.');
+
+        try {
+            const response = await fetch('/chatrooms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usernames }),
+            });
+            const room = await response.json();
+            if (response.ok) {
+                alert(`Chat room created: ${room.name || 'One-to-One Room'}`);
+            } else {
+                alert(`Error: ${room.error}`);
+            }
+        } catch (error) {
+            console.error('Error creating room:', error);
+        }
+    });
+    
     .chat_window
       .top_menu
         .buttons
