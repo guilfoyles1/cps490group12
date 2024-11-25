@@ -22,16 +22,21 @@ script.
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ usernames }),
             });
-            const room = await response.json();
+
             if (response.ok) {
+                const room = await response.json();
                 alert(`Chat room created: ${room.name || 'One-to-One Room'}`);
+                window.location.href = `/chat/${room._id}`;  // Redirect to the new chat room
             } else {
-                alert(`Error: ${room.error}`);
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
             }
         } catch (error) {
             console.error('Error creating room:', error);
+            alert('Error creating chat room');
         }
     });
+
     
     .chat_window
       .top_menu
