@@ -47,9 +47,9 @@ router.post('/new_chat', async (req, res) => {
     });
     
     try {
-        const savedRoom = await newRoom.save()
+        const savedChat = await newChat.save()
         // Respond with the room data
-        res.status(200).json(savedRoom); // Send room data to JSON
+        res.status(200).json(savedChat); // Send room data to JSON
     } catch (error) {
         console.error('Error creating chat room: ', error);
         return res.status(500).render('test_message', { message: 'Error creating chat room.' });
