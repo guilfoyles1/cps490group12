@@ -9,7 +9,7 @@ const ChatRoom = require('../models/chatRoom');
 // Send Message
 const sendMessage = async (chatRoomId, sender, messageText) => {
     try {
-      // Step 1: Create a new message
+      // Create a new message
       const newMessage = new Message({
         sender,
         message: messageText
@@ -18,7 +18,7 @@ const sendMessage = async (chatRoomId, sender, messageText) => {
       // Save the message to the database
       await newMessage.save();
   
-      // Step 2: Find the chat room and add the message ID to its messages array
+      // Find the chat room and add the message ID to its messages array
       const chatRoom = await ChatRoom.findById(chatRoomId);
       chatRoom.messages.push(newMessage._id); // Add the new message's ObjectId to the room
   
@@ -34,6 +34,6 @@ const sendMessage = async (chatRoomId, sender, messageText) => {
 // Delete Message (?)
 // const deleteMessage = async () {};
 
-modules.exports = {
+module.exports = {
     sendMessage,
 };

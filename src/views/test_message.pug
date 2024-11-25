@@ -6,38 +6,37 @@ html
     link(href="../public/styles.css" type="text/css" rel="stylesheet")
   body
     form#create-room-form
-    input#usernames(type="text" placeholder="Enter usernames, separated by commas")
-    button(type="submit") Create Room
+      input#usernames(type="text" placeholder="Enter usernames, separated by commas")
+      button(type="submit") Create Room
 
-script.
-    const form = document.getElementById('create-room-form');
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const usernames = document.getElementById('usernames').value.split(',').map(u => u.trim());
-        if (usernames.length === 0) return alert('Enter at least one username.');
-
-        try {
-            const response = await fetch('/new_chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames }),
-            });
-
-            if (response.ok) {
-                const room = await response.json();
-                alert(`Chat room created: ${room.name || 'One-to-One Room'}`);
-                window.location.href = `/chat/${room._id}`;  // Redirect to the new chat room
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
+    script.
+        const form = document.getElementById('create-room-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const usernames = document.getElementById('usernames').value.split(',').map(u => u.trim());
+            if (usernames.length === 0) {
+                return alert('Enter at least one username.');
             }
-        } catch (error) {
-            console.error('Error creating room:', error);
-            alert('Error creating chat room');
-        }
-    });
 
-    
+            try {
+                const response = await fetch('/new_chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernames }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(`Chat room created: ${result.name || 'One-to-One Room'}`);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error creating room:', error);
+                alert('Failed to create room. Please try again.');
+            }
+        });
+
     .chat_window
       .top_menu
         .buttons
