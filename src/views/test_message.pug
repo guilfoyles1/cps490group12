@@ -17,7 +17,7 @@ script.
         if (usernames.length === 0) return alert('Enter at least one username.');
 
         try {
-            const response = await fetch('/chatrooms', {
+            const response = await fetch('/new_chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ usernames }),

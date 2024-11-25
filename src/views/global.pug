@@ -1,0 +1,40 @@
+block content
+    h1 Global Chat
+
+    // Global Chat box
+    .chat-box
+        textarea#chat-text-box(readonly) 
+            each message in messages
+                p= message.sender.username + ": " + message.message
+
+    // Chat input form
+    form#chat-form
+        input#message-input(type="text", placeholder="Type a message")
+        button(type="submit") Send
+    
+    // Script to enable socket.io
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io(); // Connect to the server's socket
+
+        // Emit 'join' event to the server (can be personalized with user details)
+        socket.emit('join', { username: user.username });
+
+        // Listen for new messages
+        socket.on('newMessage', (message) => {
+            const chatBox = document.getElementById('chat-text-box');
+            chatBox.value += `${message.sender}: ${message.message}\n`;
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+        });
+
+        // Handle sending new messages
+        const form = document.getElementById('chat-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
+            if (message) {
+                socket.emit('sendMessage', message); // Send message to the server
+                messageInput.value = ''; // Clear the input
+            }
+        });

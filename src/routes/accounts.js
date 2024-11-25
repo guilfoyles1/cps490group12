@@ -48,7 +48,10 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body; 
+    const { username, password } = req.body;
+    // Logic to redirect back to page they started from
+    const fromUrl = req.query.from;
+
     if (!username || !password) {
         res.render('login', { message: "Please enter both username and password!" });
         return;
@@ -65,7 +68,13 @@ router.post('/login', async (req, res) => {
         req.session.user = user;
         console.log("Session after login:", req.session);
         console.log(`${user.id} logged in.`);
-        res.redirect('/protected_page');
+
+        // Redirect to original page, otherwise load protected_page
+        if (fromUrl) {
+            res.redirect(fromUrl);
+        } else {
+            res.redirect('/protected_page');
+        }
     } else {
         return res.render('login', { message: "Invalid credentials!" });
     }
@@ -84,7 +93,7 @@ router.get('/logout', (req, res) => {
 router.get('/protected_page', (req, res) => {
     console.log("Accessing protected page - Session data:", req.session);
     if (!req.session.user) { // Check if user is logged in
-        return res.redirect('/login'); // Redirect to login if not
+        return res.redirect('/login?from=${encodeURIComponent(req.originalUrl)}'); // Redirect to login if not
     }
     res.render('protected_page', { name: req.session.user.name }); // Passing 'name' instead of 'id'
 });

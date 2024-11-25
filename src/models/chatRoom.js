@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const messageSchema = require("../models/message"); // Import the User model
+const Message = require("../models/message"); // Import the message model
 
 
-const ChatRoomSchema = new Schema(
+const ChatRoomSchema = new mongoose.Schema(
     {
       name: {
         type: String
@@ -16,8 +16,11 @@ const ChatRoomSchema = new Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    }], // 2 users for one-to-one
-      messages: [messageSchema],
+    }], // 2 users for one-to-one, all users added for global
+      messages: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message'
+      }],
       createdAt: {
         type: Date,
         default: Date.now

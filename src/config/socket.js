@@ -1,32 +1,3 @@
-// const { Server } = require('socket.io');
-
-// let io;
-
-// const socket = (server) => {
-//     io = new Server(server); // Initialize socketio
-
-//     io.on("connection", (socket) => {
-//         console.log("user connected");
-    
-//         socket.on("disconnect", function() {
-//             console.log("user disconnected");
-//         });
-    
-//         //active typing
-//         socket.on("typing", data => {
-//             socket.broadcast.emit("notifyTyping", {
-//                 user: data.user,
-//                 message: data.message
-//             });
-//         });
-//     });
-// };
-
-
-// module.exports = {
-//     socket,
-// };
-
 const socketio = require('socket.io');
 
 module.exports = (server) => {

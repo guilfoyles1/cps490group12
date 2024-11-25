@@ -12,11 +12,50 @@ html
                 
                 h4(style="color:blue") This is a test page created until the project is furthered.
                 br
+                // Signup Button
                 button(type="button" style="margin-right: 10px;" onClick="window.location.href = '/signup';") Signup
+                // Login Button
                 button(type="button" onClick="window.location.href = '/login';") Login
-    script(src="/socket.io/socket.io.js")
-    script.
-        const socket = io();
-        socket.on('connect', () => {
-            console.log('Connected to server via Socket.IO');
-        });
+
+                // Global Chat Box
+                if user
+                    #global-chat
+                        div#chat-box
+                            div#messages
+                            input#message-input(type="text" placeholder="Type a message...")
+                            button#send-message Send Message
+                else
+                    p You must be logged in to chat.
+
+            script(src="/socket.io/socket.io.js")
+            script.
+                const socket = io(); // Initialize socket connection
+
+                // Check if user is logged in and inject username if so
+                const user = !{user ? JSON.stringify(user) : 'null'}; // Inject user info from Express
+
+                socket.on('connect', () => {
+                    console.log('Connected to server via Socket.IO');
+                });
+
+                 // Listen for the "send" button click
+                document.getElementById('send-message')?.addEventListener('click', function() {
+                    var messageInput = document.getElementById('message-input');
+                    var message = messageInput.value;
+
+                    if (message.trim() && user) {
+                        // Emit the message only if logged in
+                        socket.emit('sendMessage', { user: user.username, message: message });
+                        messageInput.value = ''; // Clear the input
+                    } else {
+                        alert('You must be logged in to send a message');
+                    }
+                });
+
+                // Listen for incoming messages
+                socket.on('newMessage', function(data) {
+                    var messagesDiv = document.getElementById('messages');
+                    var newMessage = document.createElement('p');
+                    newMessage.textContent = `${data.sender}: ${data.message}`;
+                    messagesDiv.appendChild(newMessage);
+                });
