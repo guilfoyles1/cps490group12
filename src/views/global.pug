@@ -3,22 +3,25 @@ block content
 
     // Global Chat box
     .chat-box
-        textarea#chat-text-box(readonly) 
+        textarea#chat-text-box(readonly rows="15" cols="50")
             each message in messages
-                p= message.sender.username + ": " + message.message
+                if message.sender
+                    p= `${message.sender.username}: ${message.message}`
+                else
+                    p= `Anonymous: ${message.message}`
 
     // Chat input form
     form#chat-form
-        input#message-input(type="text", placeholder="Type a message")
+        input#message-input(type="text" placeholder="Type a message" required)
         button(type="submit") Send
     
-    // Script to enable socket.io
+    // Enable socket.io and handle message updates
     script(src="/socket.io/socket.io.js")
     script.
         const socket = io(); // Connect to the server's socket
 
-        // Emit 'join' event to the server (can be personalized with user details)
-        socket.emit('join', { username: user.username });
+        // Join the global chat room
+        socket.emit('join', { room: 'global' });
 
         // Listen for new messages
         socket.on('newMessage', (message) => {
@@ -34,7 +37,19 @@ block content
             const messageInput = document.getElementById('message-input');
             const message = messageInput.value;
             if (message) {
-                socket.emit('sendMessage', message); // Send message to the server
-                messageInput.value = ''; // Clear the input
+                fetch('/global', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newMessage: message }),
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        messageInput.value = ''; // Clear input on success
+                    } else {
+                        alert('Failed to send message.');
+                    }
+                })
+                .catch((err) => console.error('Error:', err));
             }
         });
