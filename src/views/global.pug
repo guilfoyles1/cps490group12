@@ -19,9 +19,19 @@ block content
     script(src="/socket.io/socket.io.js")
     script.
         const socket = io(); // Connect to the server's socket
+        const currentUser = `#{username}`;
+        const room = 'global';
 
-        // Join the global chat room
-        socket.emit('join', { room: 'global' });
+        // Join the global chat room on connect
+        socket.on('connect') => {
+            socket.emit('join', (room, currentUser));
+        };
+
+        // Leave the global chat room on disconnect
+        socket.on('disconnect') => {
+            socket.emit('leave', (room, currentUser));
+        };
+
 
         // Listen for new messages
         socket.on('newMessage', (message) => {
