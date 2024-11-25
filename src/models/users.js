@@ -32,14 +32,6 @@ const UserSchema = new mongoose.Schema({
     },
 });
 
-// Hash the password before saving the user document
-UserSchema.pre('save', async function(next) {
-    if (this.isModified('password') || this.isNew) {
-        this.password = await bcrypt.hash(this.password, 10);
-    }
-    next();
-});
-
 const UserModel = mongoose.model('User', UserSchema);
 
 module.exports = UserModel;
