@@ -2,6 +2,7 @@ const userController = require("../controllers/user");
 const Users = require("../models/users"); // Import the User model
 const bcrypt = require('bcrypt'); // Import bcrypt
 const router = require("express").Router();
+const userControl = require("../controllers/user");
 
 // GET & POST for Signup
 router.get('/signup', (req, res) => { // Signup GET request
@@ -111,6 +112,35 @@ router.get('/update_user', (req, res) => {
         return res.redirect('/login');    
     }
     res.render('update_user');
+});
+
+router.post('/update_user', async (req, res) => {
+    const { actionType } = req.body;
+
+    try {
+        switch(actionType) {
+            case 'update-username':
+                const { newUsername } = req.body;
+                await userControl.updateUsername(req, res, newUsername);
+                console.log('Updating username to: ', newUsername);
+                break;
+            case 'update-email':
+                const { newEmail } = req.body;
+                await userControl.updateEmail(req, res, newEmail);
+                console.log('Updating email to: ', newEmail);
+                break;
+            case 'update-password':
+                const { newPassword } = req.body;
+                await userControl.updatePassword(req, res, newPassword);
+                console.log('Updating password');
+                break;
+            default:
+                return res.status(400).json({ error: 'Invalid action'});
+        }
+    } catch {
+        console.error('Error updating user: ', error);
+        res.status(500).json({ error: 'Failed to update user.' });
+    }
 });
 
 module.exports = router;

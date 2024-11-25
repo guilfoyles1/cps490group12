@@ -17,21 +17,24 @@ html
                     br
 
                     // Username Update Form
-                    form(action="/update-username" method="POST")
+                    form(action="/update_user" method="POST")
+                        input(type="hidden" name="actionType" value="update-username")
                         label(for="newUsername") New Username:
                         input(type="text" name="newUsername" required)
                         button(type="submit") Update Username
                     br
 
                     // Email update Form
-                    form(action="/update-email" method="POST")
+                    form(action="/update_user" method="POST")
+                        input(type="hidden" name="actionType" value="update-email")
                         label(for="newEmail") New Email:
                         input(type="text" name="newEmail" required)
                         button(type="submit") Update Email
                     br
 
                     // Password Update Form
-                    form(action="/update-password]" method="POST")
+                    form(action="/update_user" method="POST")
+                        input(type="hidden" name="actionType" value="update-password")
                         label(for="newPassword") New Password:
                         input(type="text" name="newPassword" required)
                         button(type="submit") Update Password
