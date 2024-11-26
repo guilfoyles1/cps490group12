@@ -1,78 +1,86 @@
 const { createClient } = require("redis");
 const { createAdapter } = require("@socket.io/redis-adapter");
 const socketio = require("socket.io");
+const jwt = require("jsonwebtoken");
 
-// Create Redis clients for pub/sub
-const pubClient = createClient({ host: "localhost", port: 6379 });
+// Load environment variables from .env file
+require("dotenv").config();
+
+// Redis clients for pub/sub
+const pubClient = createClient({
+    host: process.env.REDIS_HOST || "localhost",
+    port: process.env.REDIS_PORT || 6379,
+});
 const subClient = pubClient.duplicate();
 
-// Error handling for Redis clients
+// Redis connection error handling
 pubClient.on("error", (err) => console.log("Redis Client Error", err));
 subClient.on("error", (err) => console.log("Redis Client Error", err));
 
-// Connect Redis clients
 pubClient.connect().catch(console.error);
 subClient.connect().catch(console.error);
 
-// Export Socket.IO setup function
+// Socket.IO setup function
 module.exports = (httpServer) => {
     const io = socketio(httpServer, {
         cors: {
-            origin: "http://localhost:8080", // Allow CORS for the specified origin
+            origin: process.env.FRONTEND_URL || "http://localhost:8080",  // Allow CORS
         },
     });
 
     // Attach Redis adapter to Socket.IO
     io.adapter(createAdapter(pubClient, subClient));
 
-    // Middleware for authentication
+    // Middleware for authentication using JWT
     io.use((socket, next) => {
         const token = socket.handshake.auth?.token;
 
         if (!token) {
-            console.log('Authentication error: No token provided');
-            return next(new Error('Authentication error'));
+            console.log("Authentication error: No token provided");
+            return next(new Error("Authentication error"));
         }
 
         try {
-            const user = verifyToken(token); // Implement token verification logic
+            const user = verifyToken(token);  // Token verification
             socket.user = user;
-            next(); // Proceed to connection
+            next();  // Proceed to connection
         } catch (err) {
-            console.log('Authentication error: Invalid token');
-            return next(new Error('Authentication error'));
+            console.log("Authentication error: Invalid token");
+            return next(new Error("Authentication error"));
         }
     });
 
-    // Handle connection events
+    // Connection event handling
     io.on("connection", (socket) => {
         console.log(`User connected: ${socket.user.username}`);
 
-        // Handle messaging event
-        socket.on("sendMessage", (message) => {
-            console.log(`Message from ${socket.user.username}: ${message.content}`);
-            // Broadcast message to all clients (or a specific group)
-            io.emit("receiveMessage", { username: socket.user.username, content: message.content });
+        // Handle sending private messages
+        socket.on("private message", ({ content, to }) => {
+            socket.to(to).emit("private message", {
+                content,
+                from: socket.user.username,
+            });
         });
 
-        // Handle join event
-        socket.on("join", (user) => {
-            console.log(`${user.username} joined the chat`);
-            socket.username = user.username;
-        });
-
-        // Handle disconnect event
+        // Handle user disconnection
         socket.on("disconnect", () => {
-            console.log("User disconnected");
+            console.log(`User disconnected: ${socket.user.username}`);
         });
     });
 };
 
-// Example token verification function
+// JWT Token verification function
 function verifyToken(token) {
-    if (token === "your-secret-token") {
-        return { username: "authorized_user" };
-    } else {
+    const SECRET_KEY = process.env.JWT_SECRET_KEY;
+
+    if (!SECRET_KEY) {
+        throw new Error("Missing JWT secret key");
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);  // Decode JWT token
+        return decoded;  // Return decoded user data
+    } catch (err) {
         throw new Error("Invalid token");
     }
 }

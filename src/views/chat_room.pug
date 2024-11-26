@@ -1,13 +1,13 @@
 html
-  head
-    title Chat Room
-    link(href="../public/styles.css" type="text/css" rel="stylesheet")
-  body
-    h1 Chat Room: #{room.name}
-    ul#messages
-      each message in room.messages
-        li= message.text
-    form#send-message
-      input(type="text" id="message" placeholder="Type your message...")
-      button(type="submit") Send Message
-    script(src="/js/chat.js")
+    head
+        title Chat Room
+        link(href="../public/styles.css" type="text/css" rel="stylesheet")
+    body
+        h1 Chat Room: #{room.name}
+        ul#messages
+            each message in room.messages
+                li= message.text
+        form#send-message
+            input(type="text" id="message" placeholder="Type your message...")
+            button(type="submit") Send Message
+        script(src="/js/chat.js")

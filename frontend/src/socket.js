@@ -1,36 +1,45 @@
 import { io } from 'socket.io-client';
 
-// Retrieve the JWT token from localStorage (or Vuex store, or wherever you store it)
-const token = localStorage.getItem('auth_token'); // Replace with your token retrieval method
+// Retrieve the JWT token from localStorage
+const token = localStorage.getItem('auth_token');  // Adjust this based on your actual token storage method
 
-// Declare socket and sendMessage at the top level
 let socket;
 let sendMessage;
+let users = [];  // Store list of users
 
-// Check if the token exists before attempting to connect
+// Connect to the server with the JWT token if available
 if (!token) {
   console.error('Authentication error: No token found');
-  // Handle the error appropriately, such as redirecting to login
 } else {
-  // Connect to the backend server using the token
+  // Connect to the server with the JWT token
   socket = io('http://localhost:3000', {
     auth: {
-      token: token, // Send the token to the backend for authentication
+      token: token,  // Send the JWT token to the server for authentication
     },
   });
 
-  // Listen for messages from the server
-  socket.on('receiveMessage', (message) => {
-    console.log('Received message:', message);
-    // You can handle the message here, like updating your Vue component's state
+  // Listen for the 'users' event to update the users list
+  socket.on('users', (userList) => {
+    users = userList;
+    console.log('Connected users:', users);
   });
 
-  // Function to send a message to the server
-  sendMessage = function(content) {
-    const message = { content: content };
-    socket.emit('sendMessage', message); // Emit the message event to the server
+  // Listen for incoming private messages
+  socket.on('private message', (message) => {
+    console.log('Received private message:', message);
+    // Handle the message (e.g., update Vue component state)
+  });
+
+  // Function to send a private message
+  sendMessage = function(content, recipientId) {
+    if (recipientId) {
+      const message = { content, to: recipientId };
+      socket.emit('private message', message);  // Emit private message to the server
+    } else {
+      console.error('No recipient selected');
+    }
   };
 }
 
-// Export the socket instance and sendMessage function for use in components
-export { socket, sendMessage };
+// Export socket and sendMessage for use in Vue components
+export { socket, sendMessage, users };

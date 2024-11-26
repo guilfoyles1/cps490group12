@@ -9,7 +9,6 @@ html
                 h3(style="color:purple") By Abby Foppe, Shay Guilfoyles, Paras Rajan, Zach Spears
 
             main
-                
                 h4(style="color:blue") This is a test page created until the project is furthered.
                 br
                 // Signup Button
@@ -17,45 +16,46 @@ html
                 // Login Button
                 button(type="button" onClick="window.location.href = '/login';") Login
 
-            //-     // Global Chat Box
-            //-     if user
-            //-         #global-chat
-            //-             div#chat-box
-            //-                 div#messages
-            //-                 input#message-input(type="text" placeholder="Type a message...")
-            //-                 button#send-message Send Message
-            //-     else
-            //-         p You must be logged in to chat.
+                // Display the chat if the user is logged in
+                if user
+                    #global-chat
+                        h4 Chat Room
+                        div#chat-box
+                            div#messages
+                            input#message-input(type="text" placeholder="Type a message...")
+                            button#send-message Send Message
+                else
+                    p You must be logged in to chat.
 
-            //- script(src="/socket.io/socket.io.js")
-            //- script.
-            //-     const socket = io(); // Initialize socket connection
+            script(src="/socket.io/socket.io.js")
+            script.
+                const socket = io(); // Initialize socket connection
 
-            //-     // Check if user is logged in and inject username if so
-            //-     const user = !{user ? JSON.stringify(user) : 'null'}; // Inject user info from Express
+                // Check if user is logged in and inject username if so
+                const user = !{user ? JSON.stringify(user) : 'null'}; // Inject user info from Express
 
-            //-     socket.on('connect', () => {
-            //-         console.log('Connected to server via Socket.IO');
-            //-     });
+                socket.on('connect', () => {
+                    console.log('Connected to server via Socket.IO');
+                });
 
-            //-      // Listen for the "send" button click
-            //-     document.getElementById('send-message')?.addEventListener('click', function() {
-            //-         var messageInput = document.getElementById('message-input');
-            //-         var message = messageInput.value;
+                // Listen for the "send" button click
+                document.getElementById('send-message')?.addEventListener('click', function() {
+                    var messageInput = document.getElementById('message-input');
+                    var message = messageInput.value;
 
-            //-         if (message.trim() && user) {
-            //-             // Emit the message only if logged in
-            //-             socket.emit('sendMessage', { user: user.username, message: message });
-            //-             messageInput.value = ''; // Clear the input
-            //-         } else {
-            //-             alert('You must be logged in to send a message');
-            //-         }
-            //-     });
+                    if (message.trim() && user) {
+                        // Emit the message only if logged in
+                        socket.emit('sendMessage', { user: user.username, message: message });
+                        messageInput.value = ''; // Clear the input
+                    } else {
+                        alert('You must be logged in to send a message');
+                    }
+                });
 
-            //-     // Listen for incoming messages
-            //-     socket.on('newMessage', function(data) {
-            //-         var messagesDiv = document.getElementById('messages');
-            //-         var newMessage = document.createElement('p');
-            //-         newMessage.textContent = `${data.sender}: ${data.message}`;
-            //-         messagesDiv.appendChild(newMessage);
-            //-     });
+                // Listen for incoming messages
+                socket.on('newMessage', function(data) {
+                    var messagesDiv = document.getElementById('messages');
+                    var newMessage = document.createElement('p');
+                    newMessage.textContent = `${data.sender}: ${data.message}`;
+                    messagesDiv.appendChild(newMessage);
+                });
