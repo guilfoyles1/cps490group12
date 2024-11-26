@@ -66,6 +66,9 @@ export default {
         }
       }
     });
+
+    // Assuming you will pass user data (e.g., from the backend or socket connection)
+    socket.emit('joinRoom', { roomID: this.$route.params.roomID });
   },
 };
 </script>
