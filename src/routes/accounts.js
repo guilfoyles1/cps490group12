@@ -57,6 +57,10 @@ router.use((req, res, next) => {
 
 
 router.get('/login', (req, res) => {
+    // Redirect if already logged in
+    if (req.session.user && req.session) {
+        res.redirect('/');
+    }
     res.render('login');
 });
 
@@ -83,12 +87,7 @@ router.post('/login', async (req, res) => {
         console.log("Session after login:", req.session);
         console.log(`${user.id} logged in.`);
 
-        // Redirect to original page, otherwise load protected_page
-        // if (fromUrl) {
-        //     res.redirect(fromUrl);
-        // } else {
-        //     res.redirect('/protected_page');
-        // }
+        // Redirect to original page, otherwise redirect home
         return res.redirect(fromUrl);
     } else {
         return res.render('login', { message: "Invalid credentials!" });
@@ -97,9 +96,17 @@ router.post('/login', async (req, res) => {
 
 // GET /logout
 router.get('/logout', (req, res) => {
+    // Redirect if not logged in
+    if (!req.session || !req.session.user) {
+        console.log("No session found. Redirecting to homepage.");
+        delete req.session.redirectTo; // Clears saved URL from session
+        return res.redirect('/');
+    }
+
     const username = req.session.user.username;
     req.session.destroy(() => {
         console.log(`${username} logged out.`);
+        res.clearCookie('connect.sid');
         res.redirect('/');
     });
 });
