@@ -20,8 +20,10 @@ const db = require('./config/db');  // Make sure this file is set up to handle D
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views')); // Adjust this path if necessary
 
-// Serve the static files from the Vue.js build folder (dist) after building the app
-app.use('/', express.static(path.join(__dirname, 'frontend/dist')));
+// Set up static middleware to serve Vue app (Make sure your build directory is correct)
+app.use('/', express.static(path.join(__dirname, 'dist')));
+// Serve static files from public
+app.use('/', express.static(path.join(__dirname, 'public')));
 
 // Middleware for parsing JSON data
 app.use(bodyParser.json());
