@@ -1,20 +1,22 @@
+const path = require('path'); // Import 'path' module
+
 module.exports = {
   devServer: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',  // Backend API (your app running on port 3001)
+      '/api': { // Proxy for backend API
+        target: 'http://localhost:3001', // Backend running on port 3001
         changeOrigin: true,
-        pathRewrite: { '^/api': '' },  // Rewrites '/api' to base URL for the backend
+        pathRewrite: { '^/api': '' }, // Rewrite '/api' prefix to ''
       },
-      '/socket.io': {
-        target: 'http://localhost:3001',  // WebSocket API (Backend Socket.IO service)
-        ws: true,  // Enable WebSocket proxying
+      '/socket.io': { // Proxy for WebSocket
+        target: 'http://localhost:3001', // Backend WebSocket running on port 3001
+        ws: true, // Enable WebSocket proxying
         changeOrigin: true,
       },
-      '/chat': {
+      '/chat': { // Proxy for chat functionality
         target: 'http://localhost:8080', // Chat app running on port 8080
         changeOrigin: true,
-        pathRewrite: { '^/chat': '' },  // Rewrites '/chat' to base URL for the chat app
+        pathRewrite: { '^/chat': '' }, // Rewrite '/chat' prefix to ''
       },
     },
   },

@@ -1,13 +1,18 @@
 <template>
   <div>
     <div class="left-panel">
-      <user
+      <button @click="startNewChat">New Chat</button>
+      <!-- Iterate over users and display user information -->
+      <div
         v-for="user in users"
         :key="user.userID"
-        :user="user"
-        :selected="selectedUser === user"
-        @select="onSelectUser(user)"
-      />
+        :class="{ selected: selectedUser === user }"
+        @click="onSelectUser(user)"
+        class="user-item"
+      >
+        <span>{{ user.name }}</span> <!-- Display user name or any other property -->
+        <span v-if="user.hasNewMessages" class="new-message-indicator">New Messages</span>
+      </div>
     </div>
     <message-panel
       v-if="selectedUser"
@@ -20,12 +25,11 @@
 
 <script>
 import socket from "../socket";
-import User from "./User";
 import MessagePanel from "./MessagePanel";
 
 export default {
-  name: "Chat",
-  components: { User, MessagePanel },
+  name: "ChatComponent",
+  components: { MessagePanel },
   data() {
     return {
       selectedUser: null,
@@ -33,6 +37,9 @@ export default {
     };
   },
   methods: {
+    startNewChat() {
+      this.$router.push({ name: "NewChat" }); // Navigate to the New Chat route
+    },
     onMessage(content) {
       if (this.selectedUser) {
         socket.emit("private message", {
@@ -67,8 +74,26 @@ export default {
       }
     });
 
-    // Assuming you will pass user data (e.g., from the backend or socket connection)
-    socket.emit('joinRoom', { roomID: this.$route.params.roomID });
+    if (this.$route.params.roomID) {
+      socket.emit("joinRoom", { roomID: this.$route.params.roomID });
+    }
   },
 };
 </script>
+
+<style scoped>
+/* Add some basic styling for the user list */
+.user-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.user-item.selected {
+  background-color: #e0e0e0;
+}
+
+.new-message-indicator {
+  color: red;
+  font-size: 12px;
+}
+</style>

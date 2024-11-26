@@ -55,13 +55,19 @@ export default {
   },
   methods: {
     selectUsername() {
-      // Set the username in the socket
+      if (socket && !socket.connected) {
+        // Connect the socket if it's not already connected
+        socket.connect();
+      }
+      
+      // Set the username in the socket auth object
       socket.auth = { username: this.username };
-      socket.connect();
-      this.usernameSelected = true;
-
-      // Notify the server that the user has selected a username
+      
+      // Emit the username selection event
       socket.emit('user selected', this.username);
+      
+      // Set usernameSelected flag to true
+      this.usernameSelected = true;
     },
     selectRecipient(user) {
       // Set the selected user for private messaging
