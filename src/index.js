@@ -7,40 +7,40 @@ const session = require('express-session');
 
 // SocketIO Loader
 const { createServer } = require('http');
-const server = createServer(app);
+const httpServer = createServer(app);
 const socket = require('./config/socket');
-socket(server);
+socket(httpServer);
 
 // Database Loader
 const db = require('./config/db');
 
 app.set('view engine', 'pug');
 app.set('views', './views');
-//set up static middleware
-app.use('/', express.static('public'))
 
-//For parsing application/json
+// Set up static middleware
+app.use('/', express.static('public'));
+
+// For parsing application/json
 app.use(bodyParser.json());
-//For parsing application/x-www-form-urlencoded
+// For parsing application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-//For parsing multipart/form-data
+// For parsing multipart/form-data
 app.use(upload.array());
 
 // Configure session middleware
 app.use(session({
     secret: 'my_super_secret_key', // Hardcoded secret. Replace with an environment variable in production for enhanced security
-    resave: false, // Forces session to be saved back to the session store, even if it was never modified
-    saveUninitialized: true, // Forces a session that is uninitialized to be saved to the store
+    resave: false,
+    saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
-//Initialize router in index
+// Initialize router in index
 const router = require('./routes');
-//Tell index to use router for all links starting with '/'
 app.use('/', router);
 
-//Run application
-const port = process.env.PORT || 3001;
-server.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+// Run application
+const port = process.env.PORT || 3000; // Changed to 3000 as per instructions
+httpServer.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });

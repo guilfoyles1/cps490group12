@@ -9,6 +9,7 @@
   "author": "Abby Foppe, Shay Guilfoyle, Paras Rajan, Zach Spears",
   "license": "ISC",
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
@@ -18,7 +19,9 @@
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.7",
     "pug": "^3.0.3",
+    "redis": "^4.7.0",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "socketio": "^1.0.0"
   }
 }
