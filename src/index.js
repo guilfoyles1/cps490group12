@@ -21,6 +21,8 @@ app.set('views', path.join(__dirname, 'views')); // Adjust this path if necessar
 
 // Set up static middleware to serve Vue app (Make sure your build directory is correct)
 app.use('/', express.static(path.join(__dirname, 'dist')));
+// Serve static files from public
+app.use('/', express.static(path.join(__dirname, 'public')));
 
 // For parsing application/json
 app.use(bodyParser.json());

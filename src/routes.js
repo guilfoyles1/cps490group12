@@ -9,7 +9,16 @@ const messageRouter = require("../src/routes/message");
 
 // Handle '/' loading home page
 router.get("/", (req, res) => {
-    res.render('home_page');
+    // Check user logged in and pass username to pug
+    if (req.session && req.session.user) {
+        username = req.session.user.username;
+    } else {
+        username = '';
+    }
+    res.render('home_page', {
+        isLoggedIn: req.session && req.session.user,
+        username
+    });
 });
 
 

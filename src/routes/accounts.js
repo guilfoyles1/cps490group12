@@ -44,6 +44,18 @@ router.post('/signup', async (req, res) => { // Signup POST request
 });
 
 // GET & POST for Login
+router.use((req, res, next) => {
+    if (!req.session.user && !req.originalUrl.startsWith('/login') && !req.originalUrl.startsWith('/signup') && !req.originalUrl.match(/^\/(styles|js|images|favicon)/) ) {
+        req.session.redirectTo = req.originalUrl; // Save the requested URL in the session
+    }
+    // Set redirectTo to '/' by default if undefined
+    if (!req.session.redirectTo) {
+        req.session.redirectTo = '/';
+    } 
+    next();
+});
+
+
 router.get('/login', (req, res) => {
     res.render('login');
 });
@@ -51,7 +63,8 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     // Logic to redirect back to page they started from
-    const fromUrl = req.query.from;
+    const fromUrl = req.session.redirectTo;
+    delete req.session.redirectTo; // Clears saved URL from session
 
     if (!username || !password) {
         res.render('login', { message: "Please enter both username and password!" });
@@ -71,11 +84,12 @@ router.post('/login', async (req, res) => {
         console.log(`${user.id} logged in.`);
 
         // Redirect to original page, otherwise load protected_page
-        if (fromUrl) {
-            res.redirect(fromUrl);
-        } else {
-            res.redirect('/protected_page');
-        }
+        // if (fromUrl) {
+        //     res.redirect(fromUrl);
+        // } else {
+        //     res.redirect('/protected_page');
+        // }
+        return res.redirect(fromUrl);
     } else {
         return res.render('login', { message: "Invalid credentials!" });
     }
@@ -86,15 +100,16 @@ router.get('/logout', (req, res) => {
     const username = req.session.user.username;
     req.session.destroy(() => {
         console.log(`${username} logged out.`);
-        res.redirect('/login');
-    });   
+        res.redirect('/');
+    });
 });
 
 // GET /protected_page
 router.get('/protected_page', (req, res) => {
     console.log("Accessing protected page - Session data:", req.session);
     if (!req.session.user) { // Check if user is logged in
-        return res.redirect('/login?from=${encodeURIComponent(req.originalUrl)}'); // Redirect to login if not
+        req.session.redirectTo = req.originalUrl;
+        return res.redirect('/login'); // Redirect to login if not
     }
     res.render('protected_page', { name: req.session.user.name }); // Passing 'name' instead of 'id'
 });
@@ -111,7 +126,7 @@ router.get('/update_user', (req, res) => {
     if (!req.session.user) { //Check if logged in
         return res.redirect('/login');    
     }
-    res.render('update_user');
+    res.render('update_user', { name: req.session.user.name });
 });
 
 router.post('/update_user', async (req, res) => {
