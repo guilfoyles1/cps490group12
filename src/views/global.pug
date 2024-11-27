@@ -1,65 +1,71 @@
+html
+  head
+    title Global Chat
+    link(href="/styles.css" type="text/css" rel="stylesheet")
+
 block content
-    h1 Global Chat
+    .container     
+        h1 Global Chat
 
-    // Global Chat box
-    .chat-box
-        textarea#chat-text-box(readonly rows="15" cols="50")
-            each message in messages
-                if message.sender
-                    p= `${message.sender.username}: ${message.message}`
-                else
-                    p= `Anonymous: ${message.message}`
+        // Global Chat box
+        .chat-box
+            textarea#chat-text-box(readonly rows="20" cols="36")
+                each message in messages
+                    if message.sender
+                        p= `${message.sender.username}: ${message.message}`
+                    else
+                        p= `Anonymous: ${message.message}`
 
-    // Chat input form
-    form#chat-form
-        input#message-input(type="text" placeholder="Type a message" required)
-        button(type="submit") Send
-    
-    // Enable socket.io and handle message updates
-    script(src="/socket.io/socket.io.js")
-    script.
-        const socket = io(); // Connect to the server's socket
-        const currentUser = `#{username}`;
-        const room = 'global';
+        // Chat input form
+        form#chat-form
+            input#message-input(type="text" placeholder="Type a message" required)
+            button(type="submit") Send
+        
+        // Enable socket.io and handle message updates
+        script(src="/socket.io/socket.io.js")
+        script.
+            const socket = io(); // Connect to the server's socket
+            const currentUser = `#{username}`;
+            const room = 'global';
 
-        // Join the global chat room on connect
-        socket.on('connect') => {
-            socket.emit('join', (room, currentUser));
-        };
+            // Join the global chat room on connect
+            socket.on('connect') => {
+                socket.emit('join', (room, currentUser));
+            };
 
-        // Leave the global chat room on disconnect
-        socket.on('disconnect') => {
-            socket.emit('leave', (room, currentUser));
-        };
+            // Leave the global chat room on disconnect
+            socket.on('disconnect') => {
+                socket.emit('leave', (room, currentUser));
+            };
 
 
-        // Listen for new messages
-        socket.on('newMessage', (message) => {
-            const chatBox = document.getElementById('chat-text-box');
-            chatBox.value += `${message.sender}: ${message.message}\n`;
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
-        });
+            // Listen for new messages
+            socket.on('newMessage', (message) => {
+                const chatBox = document.getElementById('chat-text-box');
+                chatBox.value += `${message.sender}: ${message.message}\n`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+            });
 
-        // Handle sending new messages
-        const form = document.getElementById('chat-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const messageInput = document.getElementById('message-input');
-            const message = messageInput.value;
-            if (message) {
-                fetch('/global', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ newMessage: message }),
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    if (data.success) {
-                        messageInput.value = ''; // Clear input on success
-                    } else {
-                        alert('Failed to send message.');
-                    }
-                })
-                .catch((err) => console.error('Error:', err));
-            }
-        });
+            // Handle sending new messages
+            const form = document.getElementById('chat-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const messageInput = document.getElementById('message-input');
+                const message = messageInput.value;
+                if (message) {
+                    fetch('/global', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ newMessage: message }),
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            messageInput.value = ''; // Clear input on success
+                        } else {
+                            alert('Failed to send message.');
+                        }
+                    })
+                    .catch((err) => console.error('Error:', err));
+                }
+            });
