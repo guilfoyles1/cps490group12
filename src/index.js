@@ -42,7 +42,7 @@ app.use(session({
 
 // CORS configuration to allow requests from frontend (adjust URL as necessary)
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'https://group12frontend-defd760e75d0.herokuapp.com/',  // Allow frontend domain (Vue app)
+    origin: process.env.FRONTEND_URL || 'https://group12frontendserver-1bde9aa1d224.herokuapp.com/',  // Allow frontend domain (Vue app)
     methods: ["GET", "POST"],
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
