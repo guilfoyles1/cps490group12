@@ -32,7 +32,7 @@ router.use('/', messageRouter);
 
 // Connects to message server
 router.use('/', createProxyMiddleware({
-    target: 'http://localhost:8080',
+    target: 'https://group12frontend-defd760e75d0.herokuapp.com/',
     changeOrigin: true,
     ws: true, // Enables websocket communication
     pathRewrite: { '^/chat': '' },
