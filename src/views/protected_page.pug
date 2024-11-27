@@ -1,18 +1,33 @@
 doctype html
 html
     head
-        title Protected Page
+        title Account Page
         link(rel="stylesheet", href="/styles.css")
 
     body
         .container        
             header
                 h1 Welcome, #{name}!
-                p How are you doing today?
+                h3 How are you doing today?
+                br
+                br
 
             main
                 section
-                    h2 Account Options
+                    
+                    button(type="button" onClick = "window.location.href = '/';") Home
+                    br
+                    br
                     button(type="button" onClick = "window.location.href = '/update_user';") Update User Info
-                    p Want to log out?
-                    button(type="button" onClick = "window.location.href = '/logout';") Logout
+                    br
+                    br 
+                    button(type="button" onClick = "window.location.href = '/global';") Open Chat
+                    br
+                    br
+                    //-
+                        h3 New Chat
+                        button(type="button" onClick = "window.location.href = '/new_chat';") New Chat
+                        br
+                     
+                    button(type="button" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;" onClick="window.location.href = '/logout';") Logout
+

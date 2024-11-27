@@ -1,0 +1,57 @@
+html
+  head
+    title Anonymouse Real-time chat
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css")
+    // Include the above in your HEAD tag
+    link(href="../public/styles.css" type="text/css" rel="stylesheet")
+  body
+    form#create-room-form
+      input#usernames(type="text" placeholder="Enter usernames, separated by commas")
+      button(type="submit") Create Room
+
+    script.
+        const form = document.getElementById('create-room-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission
+            const usernames = document.getElementById('usernames').value.split(',').map(u => u.trim());
+            if (usernames.length === 0) {
+                return alert('Enter at least one username.');
+            }
+
+            try {
+                const response = await fetch('/new_chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernames }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(`Chat room created: ${result.name || 'One-to-One Room'}`);
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                console.error('Error creating room:', error);
+                alert('Failed to create room. Please try again.');
+            }
+        });
+
+    .chat_window
+      .top_menu
+        .buttons
+          .button.close
+          .button.minimize
+          .button.maximize
+        .title Chat
+      ul#messages.messages
+      .bottom_wrapper.clearfix
+        i#typing
+        form#form
+          .message_input_wrapper
+            input#message.message_input(placeholder="Type your message here...")
+          button.send_message Send
+    script(src="/js/socket.js")
+    script(src="https://code.jquery.com/jquery-1.11.1.min.js")
+    script(src="https://cdn.jsdelivr.net/gh/rexeze/formatTimeStamp/src/index.min.js")
+    script(src="/js/chat.js")
