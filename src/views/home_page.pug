@@ -6,10 +6,10 @@ html
         .container
             header
                 h1(style="color:purple") CPS 490 Group 12
-                h3(style="color:purple") By Abby Foppe, Shay Guilfoyles, Paras Rajan, Zach Spears
+                h3(style="color:purple; font-size: 0.9rem; margin-top: 10px;") By: Abby Foppe, Shay Guilfoyles, Paras Rajan, Zach Spears
 
             main
-                h4(style="color:blue") This is a test page created until the project is furthered.
+                h4(style="color:blue;font-size: 0.7rem;margin-top: 20px;font-style: italic;") This is a test page created until the project is furthered.
                 br
                 if (!isLoggedIn)
                     // Signup Button
@@ -19,13 +19,13 @@ html
                 else
                     h4(style="color:blue") Welcome back #{username}!
                     // Account Button
-                    button(type="button" style="margin-right: 10px;" onClick="window.location.href = '/protected_page';") Account
+                    button(type="button" style="margin-right: 10px;margin-top: 20px;" onClick="window.location.href = '/protected_page';") Account
                     // Chats Button
                     button(type="button" onClick="window.location.href = '/chat';") Chats
                     br
                     br
                     // Logout Button
-                    button(type="button" onClick="window.location.href = '/logout';") Logout
+                    button(type="button" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;" onClick="window.location.href = '/logout';") Logout
 
             //-     // Display the chat if the user is logged in
             //-     if user
