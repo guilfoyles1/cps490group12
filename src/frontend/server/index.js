@@ -1,13 +1,13 @@
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "https://group12message-aa69d244eb3a.herokuapp.com/",
+    origin: "https://group12frontend-defd760e75d0.herokuapp.com/",
   },
 });
 
 io.on('connect', () => {
   console.log("Connected to primary server.");
-});
+})
 
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
@@ -53,5 +53,5 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () =>
-  console.log(`server listening at port ${PORT}`)
+  console.log(`server listening at http://localhost:${PORT}`)
 );
