@@ -25,6 +25,7 @@ module.exports = (httpServer) => {
     const io = socketio(httpServer, {
         cors: {
             origin: process.env.FRONTEND_URL || "http://localhost:8080",  // Allow CORS
+            methods: ["GET", "POST"],
         },
     });
 
@@ -52,7 +53,12 @@ module.exports = (httpServer) => {
 
     // Connection event handling
     io.on("connection", (socket) => {
+        const { userId, username } = socket.handshake.auth;
         console.log(`User connected: ${socket.user.username}`);
+
+        socket.on("sync session", (sessionData) => {
+            console.log("Received session: ", sessionData);
+        });
 
         // Handle sending private messages
         socket.on("private message", ({ content, to }) => {

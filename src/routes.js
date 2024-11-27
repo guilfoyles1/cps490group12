@@ -36,6 +36,20 @@ router.use('/', createProxyMiddleware({
     changeOrigin: true,
     ws: true, // Enables websocket communication
     pathRewrite: { '^/chat': '' },
+    // Sends session info between servers
+    onProxyReq: (proxyReq, req) => {
+        // Forward session cookie to the target server
+        if (req.headers.cookie) {
+            proxyReq.setHeader('Cookie', req.headers.cookie);
+        }
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        // Send target server cookies back to the client
+        const setCookieHeaders = proxyRes.headers['set-cookie'];
+        if (setCookieHeaders) {
+            res.setHeader('set-cookie', setCookieHeaders);
+        }
+    }
 }));
 
 // General error handling middleware

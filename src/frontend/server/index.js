@@ -5,6 +5,10 @@ const io = require("socket.io")(httpServer, {
   },
 });
 
+io.on('connect', () => {
+  console.log("Connected to primary server.");
+});
+
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
   if (!username) {
@@ -15,6 +19,7 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
+  console.log('User session: ', socket.handshake.session);
   // fetch existing users
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
