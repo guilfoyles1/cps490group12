@@ -8,24 +8,26 @@ html
         .container        
             header
                 h1 Welcome, #{name}!
-                h2 How are you doing today?
+                h3 How are you doing today?
                 br
                 br
 
             main
                 section
-                    h3 Home Page
+                    
                     button(type="button" onClick = "window.location.href = '/';") Home
                     br
-                    h3 Account Options
+                    br
                     button(type="button" onClick = "window.location.href = '/update_user';") Update User Info
                     br
-                    h3 Messages
+                    br 
                     button(type="button" onClick = "window.location.href = '/global';") Open Chat
+                    br
                     br
                     //-
                         h3 New Chat
                         button(type="button" onClick = "window.location.href = '/new_chat';") New Chat
                         br
-                    h3 Log out
-                    button(type="button" onClick = "window.location.href = '/logout';") Logout
+                     
+                    button(type="button" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;" onClick="window.location.href = '/logout';") Logout
+
