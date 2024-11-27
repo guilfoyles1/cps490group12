@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const userRouter = require("../src/routes/accounts");
 const messageRouter = require("../src/routes/message");
+// Allow communication between message server and website
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 // C for Create: HTTP POST
 // R for Read: HTTP GET
@@ -27,6 +29,14 @@ router.use('/', userRouter);
 
 //Adds message routes
 router.use('/', messageRouter);
+
+// Connects to message server
+router.use('/', createProxyMiddleware({
+    target: 'http://localhost:8080',
+    changeOrigin: true,
+    ws: true, // Enables websocket communication
+    pathRewrite: { '^/chat': '' },
+}));
 
 // General error handling middleware
 router.use((err, req, res, next) => {
