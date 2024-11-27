@@ -1,7 +1,7 @@
 const httpServer = require("http").createServer();
 const io = require("socket.io")(httpServer, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "https://group12message-aa69d244eb3a.herokuapp.com/",
   },
 });
 
@@ -53,5 +53,5 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 3000;
 
 httpServer.listen(PORT, () =>
-  console.log(`server listening at http://localhost:${PORT}`)
+  console.log(`server listening at port ${PORT}`)
 );

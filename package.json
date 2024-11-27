@@ -4,10 +4,11 @@
   "description": "Messenger App for Capstone 1",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "npm run dev",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "heroku-run-build-script": true,
   "author": "Abby Foppe, Shay Guilfoyle, Paras Rajan, Zach Spears",
   "license": "ISC",
   "dependencies": {

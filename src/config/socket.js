@@ -24,7 +24,7 @@ subClient.connect().catch(console.error);
 module.exports = (httpServer) => {
     const io = socketio(httpServer, {
         cors: {
-            origin: process.env.FRONTEND_URL || "http://localhost:8080",  // Allow CORS
+            origin: process.env.FRONTEND_URL || "https://group12frontend-defd760e75d0.herokuapp.com/",  // Allow CORS
             methods: ["GET", "POST"],
         },
     });
