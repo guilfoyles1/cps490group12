@@ -115,29 +115,40 @@ app.post('/chat/new', isAuthenticated, async (req, res) => {
 
   try {
     if (!recipients || recipients.trim() === "") {
-      return res.status(400).json({ error: 'Please enter at least one recipient.' });
+      return res.render('chat_room_list', {
+        username: currentUser.username,
+        chatRooms: await ChatRoom.find({ users: { $in: [currentUser._id] } }).distinct('name'),
+        error: 'Please enter at least one recipient.',
+      });
     }
 
     let recipientList = recipients.split(',').map(r => r.trim()).filter(r => r !== currentUser.username);
 
     if (recipientList.length === 0) {
-      return res.status(400).json({ error: 'You cannot create a chat with only yourself.' });
+      return res.render('chat_room_list', {
+        username: currentUser.username,
+        chatRooms: await ChatRoom.find({ users: { $in: [currentUser._id] } }).distinct('name'),
+        error: 'You cannot create a chat with only yourself.',
+      });
     }
 
-    // Ensure all recipients exist
     const validUsers = await User.find({ username: { $in: recipientList } });
     if (validUsers.length !== recipientList.length) {
-      return res.status(400).json({ error: 'One or more recipients do not exist.' });
+      return res.render('chat_room_list', {
+        username: currentUser.username,
+        chatRooms: await ChatRoom.find({ users: { $in: [currentUser._id] } }).distinct('name'),
+        error: 'One or more recipients do not exist.',
+      });
     }
 
-    // Create a unique set of user IDs (including current user)
-    const users = [...validUsers.map(user => user._id), currentUser._id].sort();
+    // Sort users and create a unique room name
+    const users = [...validUsers.map(user => user._id), currentUser._id];
+    users.sort(); // Sorting to ensure the same room is found for the same group of users
 
     // Find or create the chat room
     let chatRoom = await ChatRoom.findOne({ users: { $all: users }, type: users.length > 2 ? 'group' : 'one_to_one' });
 
     if (!chatRoom) {
-      // Creating a new chat room
       chatRoom = new ChatRoom({
         name: `Chat with ${recipientList.join(', ')}`,
         type: users.length > 2 ? 'group' : 'one_to_one',
@@ -146,11 +157,14 @@ app.post('/chat/new', isAuthenticated, async (req, res) => {
       await chatRoom.save();
     }
 
-    // Send the room ID to the client for redirecting
-    res.status(200).json({ success: true, room: chatRoom._id });
+    res.redirect(`/chat/${chatRoom._id}`);
   } catch (err) {
     console.error('Error creating new chat:', err);
-    res.status(500).json({ error: 'An error occurred while creating the chat.' });
+    res.status(500).render('chat_room_list', {
+      username: currentUser.username,
+      chatRooms: await ChatRoom.find({ users: { $in: [currentUser._id] } }).distinct('name'),
+      error: 'An error occurred while creating the chat.',
+    });
   }
 });
 
@@ -188,20 +202,17 @@ app.get('/chat/:id', isAuthenticated, async (req, res) => {
       return res.status(400).render('chat_room', { error: 'Invalid room ID.' });
     }
 
-    // Find the chat room by ID
     const chatRoom = await ChatRoom.findById(roomId).populate('users');
     if (!chatRoom) {
       return res.status(404).render('chat_room', { error: 'Chat room not found.' });
     }
 
-    // Retrieve the messages for the chat room
     const messages = await MessageModel.find({ room: roomId }).sort({ createdAt: 1 });
 
-    // Render the chat room view
     res.render('chat_room', {
       room: chatRoom,
       messages,
-      username: req.session.user.username,
+      username: req.session.user.username, // Pass the username to the client
     });
   } catch (err) {
     console.error('Error loading chat room:', err);

@@ -2,18 +2,25 @@ doctype html
 html
   head
     title Chat Room - #{room.name}
-    link(rel="stylesheet", href="/css/styles.css")
+    link(rel="stylesheet", href="/styles.css")
     script(src="/socket.io/socket.io.js") // Import socket.io
   body
-    h1 Chat Room: #{room.name}
-    
-    ul#message-list
-      each message in messages
-        li #{message.sender}: #{message.message}
+    .chat-container
+      h1 Chat Room: #{room.name}
 
-    form#message-form
-      input#message-input(type="text", placeholder="Enter your message", required)
-      button(type="submit") Send
+      .chat-box#chatWindow
+        ul#message-list
+          each message in messages
+            li.message-item
+              .message-sender #{message.sender}:
+              .message-content #{message.message}
+
+      .chat-input
+        form#message-form
+          input#message-input(type="text" placeholder="Enter your message" required)
+          .button-container
+            button(type="submit") Send
+            button(type="button" onClick="window.location.href = '/'") Home
 
     // JavaScript for real-time chat functionality
     script.
@@ -31,8 +38,12 @@ html
         socket.on('private message', ({ content, from }) => {
           const messageList = document.getElementById('message-list');
           const messageItem = document.createElement('li');
-          messageItem.textContent = `${from}: ${content}`;
+          messageItem.className = 'message-item';
+          messageItem.innerHTML = `<span class="message-sender">${from}:</span> <span class="message-content">${content}</span>`;
           messageList.appendChild(messageItem);
+
+          // Scroll to the bottom
+          chatWindow.scrollTop = chatWindow.scrollHeight;
         });
 
         // Handle sending a message

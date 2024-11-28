@@ -20,7 +20,7 @@ body {
 .container {
   background-color: #ffffff;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -28,8 +28,8 @@ body {
 }
 
 /* Header styling */
-.container h1 {
-  font-size: 1.8rem;
+.container h1, .chat-container h1 {
+  font-size: 2rem;
   color: #4e3b8e;
   margin-bottom: 1rem;
 }
@@ -95,6 +95,7 @@ label {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
 }
 
 .chat-box {
@@ -103,6 +104,7 @@ label {
   border: 1px solid #ddd;
   padding: 10px;
   background-color: #fafafa;
+  margin-bottom: 20px;
 }
 
 ul {
@@ -112,15 +114,16 @@ ul {
 
 .chat-input {
   display: flex;
+  justify-content: center; /* Centers the entire input and button horizontally */
+  gap: 10px; /* Adds space between the input and button */
+  align-items: center; /* Ensures both input and button are vertically aligned */
   margin-top: 20px;
 }
 
 .chat-input input {
-  flex: 1;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ddd;
-  margin-right: 10px;
 }
 
 .chat-input button {
@@ -130,12 +133,19 @@ ul {
   color: white;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .chat-input button:hover {
   background-color: #218838;
 }
 
+.button-container {
+  display: flex;
+  gap: 10px; /* Adds space between the buttons */
+}
+
+/* Chat Room List Styling */
 #chat-room-list {
   list-style: none;
   padding: 0;
@@ -145,13 +155,42 @@ ul {
   margin-bottom: 10px;
 }
 
-#chat-room-list a {
+#chat-room-list a.chat-room-link {
   text-decoration: none;
   color: #007bff;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-#chat-room-list a:hover {
+#chat-room-list a.chat-room-link:hover {
   color: #0056b3;
+  background-color: #eef4ff;
   text-decoration: underline;
+}
+
+.message-item {
+  padding: 5px 0;
+}
+
+.message-sender {
+  font-weight: bold;
+  color: #4e3b8e;
+}
+
+.message-content {
+  margin-left: 10px;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
