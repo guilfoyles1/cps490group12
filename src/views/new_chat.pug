@@ -1,41 +1,16 @@
+//- views/new_chat.pug
+doctype html
 html
   head
-    title Create New Chat Room
-    link(href="/styles.css" type="text/css" rel="stylesheet")
+    title Start New Chat
+    link(rel="stylesheet", href="/css/styles.css")
   body
-    .container   
-      h1 Create a New Chat Room
-      form#new-chat-form(action="/new_chat", method="POST")
-        label(for="usernames") Enter usernames (comma-separated):
-        input(type="text" id="usernames" name="usernames" placeholder="username1, username2")
-        button(type="submit") Create Chat
+    h1 Start a New Chat
+    form#new-chat-form(action="/chat/new" method="post")
+      label(for="recipients") Enter recipient usernames (comma-separated if multiple):
+      input#recipients(type="text" name="recipients" required placeholder="Recipient usernames (e.g. user1, user2)")
+      button(type="submit") Create Chat
 
-      script.
-        // Wait for the document to be fully loaded before attaching the event listener
-        document.addEventListener('DOMContentLoaded', function() {
-          const form = document.getElementById('new-chat-form');
-          
-          form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const usernames = document.getElementById('usernames').value.split(',').map(u => u.trim());
-            if (usernames.length === 0) return alert('Enter at least one username.');
-
-            try {
-              const response = await fetch('/new_chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usernames }),
-              });
-              const room = await response.json();
-
-              if (response.ok) {
-                // Redirect to the newly created room's page
-                window.location.href = `/chat/${room._id}`;
-              } else {
-                alert(`Error: ${room.error}`);
-              }
-            } catch (error) {
-              console.error('Error creating room:', error);
-            }
-          });
-        });
+    //- Error message placeholder
+    if error
+      p.error-message(style="color: red;") #{error}

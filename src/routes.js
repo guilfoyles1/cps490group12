@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const userRouter = require("./routes/accounts");
-const messageRouter = require("./routes/message");
 const chatRouter = require("./routes/chat"); // Import chat routes
 
 // C for Create: HTTP POST
@@ -21,8 +20,6 @@ router.get("/", (req, res) => {
 // Tell routes.js to use accounts.js for handling user account info
 router.use('/', userRouter);
 
-// Adds message routes
-router.use('/', messageRouter);
 
 // Adds middleware to check if user is authenticated for chat routes
 router.use('/chat', (req, res, next) => {

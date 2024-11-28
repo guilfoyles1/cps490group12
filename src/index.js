@@ -6,10 +6,18 @@ const cors = require('cors');
 const { createServer } = require('http');
 const socketIO = require('socket.io');
 const mongoose = require('mongoose');
+const { createClient } = require("redis");
+const { createAdapter } = require("@socket.io/redis-adapter");
+const bcrypt = require('bcrypt');
+const sharedSession = require('express-socket.io-session');
+
+// Load environment variables from .env file
+require("dotenv").config();
 
 // Models
 const User = require('./models/users');
-const Chat = require('./models/chat'); // Import Chat model for chat functionality
+const ChatRoom = require('./models/chatRoom'); 
+const MessageModel = require('./models/message');
 
 // Initialize Express App
 const app = express();
@@ -17,15 +25,21 @@ const httpServer = createServer(app);
 const io = socketIO(httpServer);
 
 // Connect to MongoDB
-const dbURI = process.env.MONGO_URI || 'mongodb+srv://admin:CapstoneG12Admin!@capstone-1-app.ynepw.mongodb.net/test?retryWrites=true&w=majority';
-mongoose.connect(dbURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB');
-}).catch((err) => {
-  console.error('Error connecting to MongoDB:', err);
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
+
+// Redis clients for pub/sub
+const pubClient = createClient({
+  url: `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || 6379}`
 });
+const subClient = pubClient.duplicate();
+
+pubClient.connect().catch(console.error);
+subClient.connect().catch(console.error);
+
+// Attach Redis adapter to Socket.IO
+io.adapter(createAdapter(pubClient, subClient));
 
 // Set up view engine for server-side rendering (using Pug)
 app.set('view engine', 'pug');
@@ -36,12 +50,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configure session middleware for handling sessions
-app.use(session({
+const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET || 'my_super_secret_key',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false },
-}));
+});
+
+app.use(sessionMiddleware);
 
 // CORS configuration
 app.use(cors({
@@ -77,9 +93,9 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ username, password }).lean();
-    if (user) {
-      req.session.user = { username: user.username }; // Set the user in the session
+    const user = await User.findOne({ username }).lean();
+    if (user && await bcrypt.compare(password, user.password)) {
+      req.session.user = { username: user.username, _id: user._id }; // Set the user in the session
       const redirectTo = req.session.redirectTo || '/';
       delete req.session.redirectTo; // Clean up session data
       res.redirect(redirectTo);
@@ -92,52 +108,155 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Protected Chat Route for Group and Direct Messages
-app.get('/chat', isAuthenticated, (req, res) => {
-  res.render('chat_room', { username: req.session.user.username });
+// Route to create a new chat room
+app.post('/chat/new', isAuthenticated, async (req, res) => {
+  const { recipients } = req.body;
+  const currentUser = req.session.user;
+
+  try {
+    if (!recipients || recipients.trim() === "") {
+      return res.status(400).json({ error: 'Please enter at least one recipient.' });
+    }
+
+    let recipientList = recipients.split(',').map(r => r.trim()).filter(r => r !== currentUser.username);
+
+    if (recipientList.length === 0) {
+      return res.status(400).json({ error: 'You cannot create a chat with only yourself.' });
+    }
+
+    // Ensure all recipients exist
+    const validUsers = await User.find({ username: { $in: recipientList } });
+    if (validUsers.length !== recipientList.length) {
+      return res.status(400).json({ error: 'One or more recipients do not exist.' });
+    }
+
+    // Create a unique set of user IDs (including current user)
+    const users = [...validUsers.map(user => user._id), currentUser._id].sort();
+
+    // Find or create the chat room
+    let chatRoom = await ChatRoom.findOne({ users: { $all: users }, type: users.length > 2 ? 'group' : 'one_to_one' });
+
+    if (!chatRoom) {
+      // Creating a new chat room
+      chatRoom = new ChatRoom({
+        name: `Chat with ${recipientList.join(', ')}`,
+        type: users.length > 2 ? 'group' : 'one_to_one',
+        users,
+      });
+      await chatRoom.save();
+    }
+
+    // Send the room ID to the client for redirecting
+    res.status(200).json({ success: true, room: chatRoom._id });
+  } catch (err) {
+    console.error('Error creating new chat:', err);
+    res.status(500).json({ error: 'An error occurred while creating the chat.' });
+  }
 });
+
+// Route to render the form to create a new chat
+app.get('/new_chat', isAuthenticated, (req, res) => {
+  res.render('new_chat');
+});
+
+// Protected Chat Route for Group and Direct Messages
+app.get('/chat', isAuthenticated, async (req, res) => {
+  const currentUser = req.session.user;
+
+  try {
+    const chatRooms = await ChatRoom.find({ users: { $in: [currentUser._id] } });
+
+    res.render('chat_room_list', {
+      username: currentUser.username,
+      chatRooms,
+    });
+  } catch (err) {
+    console.error('Error loading chat rooms:', err);
+    res.render('chat_room_list', {
+      username: currentUser.username,
+      chatRooms: [],
+    });
+  }
+});
+
+// Route to access specific chat room
+app.get('/chat/:id', isAuthenticated, async (req, res) => {
+  const roomId = req.params.id;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(roomId)) {
+      return res.status(400).render('chat_room', { error: 'Invalid room ID.' });
+    }
+
+    // Find the chat room by ID
+    const chatRoom = await ChatRoom.findById(roomId).populate('users');
+    if (!chatRoom) {
+      return res.status(404).render('chat_room', { error: 'Chat room not found.' });
+    }
+
+    // Retrieve the messages for the chat room
+    const messages = await MessageModel.find({ room: roomId }).sort({ createdAt: 1 });
+
+    // Render the chat room view
+    res.render('chat_room', {
+      room: chatRoom,
+      messages,
+      username: req.session.user.username,
+    });
+  } catch (err) {
+    console.error('Error loading chat room:', err);
+    res.status(500).render('chat_room', { error: 'Error loading chat room.' });
+  }
+});
+
+io.use(sharedSession(sessionMiddleware, {
+  autoSave: true,
+}));
 
 // Socket.IO Handlers for Direct and Group Messages
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  if (socket.handshake.session.user) {
+    socket.username = socket.handshake.session.user.username;
+    console.log(`A user connected: ${socket.username}`);
+  } else {
+    console.log(`A user connected without a session: ${socket.id}`);
+    return; // Disconnect if no session is available
+  }
 
-  // Store the username of the connected user
-  socket.on('join', (username) => {
-    socket.username = username;
-    console.log(`${username} has joined the chat.`);
+  // Handle joining a room
+  socket.on('join room', (roomId) => {
+    socket.join(roomId);
+    console.log(`User ${socket.username} joined room: ${roomId}`);
   });
 
-  // Handle sending direct messages
-  socket.on('direct message', ({ recipient, message }) => {
-    const recipientSocket = [...io.sockets.sockets.values()].find(
-      (s) => s.username === recipient
-    );
+  // Handle sending private messages
+  socket.on('private message', async ({ content, room }) => {
+    const username = socket.username;
 
-    if (recipientSocket) {
-      recipientSocket.emit('direct message', {
-        sender: socket.username,
-        message,
-      });
-    }
-  });
-
-  // Handle sending group messages
-  socket.on('group message', ({ room, message }) => {
-    io.to(room).emit('group message', {
-      sender: socket.username,
-      message,
+    // Emit the message to everyone in the room (including sender)
+    io.in(room).emit('private message', {
+      content,
+      from: username,
     });
-  });
 
-  // Handle joining a group room
-  socket.on('join room', (room) => {
-    socket.join(room);
-    console.log(`${socket.username} joined room: ${room}`);
+    // Save the message to MongoDB
+    try {
+      const message = new MessageModel({
+        message: content,
+        sender: username,
+        room: room,
+        createdAt: new Date(),
+      });
+      await message.save();
+      console.log('Message saved to MongoDB:', message);
+    } catch (err) {
+      console.error('Error saving message:', err);
+    }
   });
 
   // Handle user disconnection
   socket.on('disconnect', () => {
-    console.log(`${socket.username} has disconnected.`);
+    console.log(`A user disconnected: ${socket.username}`);
   });
 });
 

@@ -1,89 +1,157 @@
 /* General reset for margin and padding */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-  }
-  
-  body {
-    background-color: #b3d9ff; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: #333;
-    margin: 0; 
-  }
-  
-  /* Container for centering content */
-  .container {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 400px;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  /* Header styling */
-  .container h1 {
-    font-size: 1.8rem;
-    color: #4e3b8e;
-    margin-bottom: 1rem;
-  }
-  
-  /* Form styling */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  /* Input fields */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  textarea {
-    padding: 0.75rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s ease;
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  textarea:focus {
-    border-color: #4e3b8e;
-    outline: none;
-  }
-  
-  /* Button styling */
-  button {
-    padding: 0.75rem;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #4e3b8e;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #3a2d6e;
-  }
-  
-  /* Additional styling for labels */
-  label {
-    text-align: left;
-    color: #555;
-    font-size: 0.9rem;
-  }
-  
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #b3d9ff; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+  margin: 0; 
+}
+
+/* Container for centering content */
+.container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Header styling */
+.container h1 {
+  font-size: 1.8rem;
+  color: #4e3b8e;
+  margin-bottom: 1rem;
+}
+
+/* Form styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Input fields */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus {
+  border-color: #4e3b8e;
+  outline: none;
+}
+
+/* Button styling */
+button {
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #4e3b8e;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #3a2d6e;
+}
+
+/* Additional styling for labels */
+label {
+  text-align: left;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Chat Page Specific Styling */
+
+.chat-container {
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-box {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background-color: #fafafa;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 20px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-right: 10px;
+}
+
+.chat-input button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #218838;
+}
+
+#chat-room-list {
+  list-style: none;
+  padding: 0;
+}
+
+#chat-room-list li {
+  margin-bottom: 10px;
+}
+
+#chat-room-list a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+#chat-room-list a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

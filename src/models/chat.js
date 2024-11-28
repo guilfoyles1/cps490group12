@@ -1,3 +1,4 @@
+// models/chat.js
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -11,8 +12,8 @@ const chatSchema = new Schema({
     required: false, // Optional for group messages
   },
   room: {
-    type: String,
-    required: false, // Used for group messages
+    type: String, // Room should be a string
+    required: true,
   },
   content: {
     type: String,

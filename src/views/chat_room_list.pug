@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title Your Chat Rooms
+    link(rel="stylesheet", href="/css/styles.css")
+  body
+    h1 Welcome, #{username}!
+    
+    h2 Your Chat Rooms
+    if chatRooms.length > 0
+      ul#chat-room-list
+        each room in chatRooms
+          li
+            a(href=`/chat/${room._id}`) #{room.name} 
+    else
+      p You have no chats started yet. Start one now!
+    
+    h2 Start a New Chat
+    form(action="/chat/new" method="POST")
+      label(for="recipients") Enter recipient usernames (comma-separated if multiple):
+      input(type="text" name="recipients" id="recipients" required)
+      button(type="submit") Create Chat

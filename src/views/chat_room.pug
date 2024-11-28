@@ -1,69 +1,48 @@
 doctype html
 html
   head
-    title Chat Room
-    script(src="/socket.io/socket.io.js")
+    title Chat Room - #{room.name}
+    link(rel="stylesheet", href="/css/styles.css")
+    script(src="/socket.io/socket.io.js") // Import socket.io
   body
-    h1 Welcome to the Chat Room, #{username}!
+    h1 Chat Room: #{room.name}
+    
+    ul#message-list
+      each message in messages
+        li #{message.sender}: #{message.message}
 
-    // Group chat area
-    h2 Group Chat
-    input#groupRoomName(type="text" placeholder="Enter group room name")
-    button#joinGroupRoom Join Group Room
-    ul#groupMessages
-    input#groupMessageInput(type="text" placeholder="Enter group message")
-    button#sendGroupMessage Send Group Message
+    form#message-form
+      input#message-input(type="text", placeholder="Enter your message", required)
+      button(type="submit") Send
 
-    // Direct message area
-    h2 Direct Message
-    input#recipientUsername(type="text" placeholder="Recipient username")
-    input#directMessageInput(type="text" placeholder="Enter direct message")
-    button#sendDirectMessage Send Direct Message
-
+    // JavaScript for real-time chat functionality
     script.
-      const socket = io();
+      document.addEventListener('DOMContentLoaded', () => {
+        const socket = io();
 
-      // Join the chat with the username
-      socket.emit('join', '#{username}');
+        // Set the username from the session
+        socket.emit('set username', "#{username}");
 
-      // Join a group room
-      document.getElementById('joinGroupRoom').addEventListener('click', () => {
-        const room = document.getElementById('groupRoomName').value;
-        if (room.trim() !== '') {
-          socket.emit('join room', room);
-          console.log(`Joined room: ${room}`);
-        }
-      });
+        // Join the chat room
+        const roomId = "#{room._id}";
+        socket.emit('join room', roomId);
 
-      // Send group message
-      document.getElementById('sendGroupMessage').addEventListener('click', () => {
-        const room = document.getElementById('groupRoomName').value;
-        const message = document.getElementById('groupMessageInput').value;
-        if (room.trim() !== '' && message.trim() !== '') {
-          socket.emit('group message', { room, message });
-          document.getElementById('groupMessageInput').value = '';
-        }
-      });
+        // Listen for private messages
+        socket.on('private message', ({ content, from }) => {
+          const messageList = document.getElementById('message-list');
+          const messageItem = document.createElement('li');
+          messageItem.textContent = `${from}: ${content}`;
+          messageList.appendChild(messageItem);
+        });
 
-      // Send direct message
-      document.getElementById('sendDirectMessage').addEventListener('click', () => {
-        const recipient = document.getElementById('recipientUsername').value;
-        const message = document.getElementById('directMessageInput').value;
-        if (recipient.trim() !== '' && message.trim() !== '') {
-          socket.emit('direct message', { recipient, message });
-          document.getElementById('directMessageInput').value = '';
-        }
-      });
+        // Handle sending a message
+        const messageForm = document.getElementById('message-form');
+        messageForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const messageInput = document.getElementById('message-input');
+          const message = messageInput.value;
 
-      // Listen for incoming group messages
-      socket.on('group message', (data) => {
-        const groupMessagesUl = document.getElementById('groupMessages');
-        const newMessageLi = document.createElement('li');
-        newMessageLi.textContent = `${data.sender}: ${data.message}`;
-        groupMessagesUl.appendChild(newMessageLi);
-      });
-
-      // Listen for incoming direct messages
-      socket.on('direct message', (data) => {
-        alert(`New message from ${data.sender}: ${data.message}`);
+          socket.emit('private message', { content: message, room: roomId });
+          messageInput.value = '';
+        });
       });
