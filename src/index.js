@@ -1,46 +1,63 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const upload = multer();
 const session = require('express-session');
+const cors = require('cors');
 
-// SocketIO Loader
+// Socket.IO Loader
 const { createServer } = require('http');
-const server = createServer(app);
+const httpServer = createServer(app);  // Create server after app initialization
 const socket = require('./config/socket');
-socket(server);
+socket(httpServer);
 
-// Database Loader
-const db = require('./config/db');
+// Database Loader (if required for user authentication or messaging)
+const db = require('./config/db');  // Make sure this file is set up to handle DB connections if necessary
 
+// Set up view engine for any server-side rendering (using Pug here, adjust as needed)
 app.set('view engine', 'pug');
-app.set('views', './views');
-//set up static middleware
-app.use('/', express.static('public'))
+app.set('views', path.join(__dirname, 'views')); // Adjust this path if necessary
 
-//For parsing application/json
+// Set up static middleware to serve Vue app (Make sure your build directory is correct)
+app.use('/', express.static(path.join(__dirname, 'dist')));
+// Serve static files from public
+app.use('/', express.static(path.join(__dirname, 'public')));
+
+// Middleware for parsing JSON data
 app.use(bodyParser.json());
-//For parsing application/x-www-form-urlencoded
+// Middleware for parsing URL-encoded data
 app.use(bodyParser.urlencoded({ extended: true }));
-//For parsing multipart/form-data
+// Middleware for parsing multipart/form-data (e.g., file uploads)
 app.use(upload.array());
 
-// Configure session middleware
+// Configure session middleware for handling sessions (like authentication)
 app.use(session({
-    secret: 'my_super_secret_key', // Hardcoded secret. Replace with an environment variable in production for enhanced security
-    resave: false, // Forces session to be saved back to the session store, even if it was never modified
-    saveUninitialized: true, // Forces a session that is uninitialized to be saved to the store
+    secret: process.env.SESSION_SECRET || 'my_super_secret_key', // Use environment variable for production
+    resave: false,
+    saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
-//Initialize router in index
+// CORS configuration to allow requests from frontend (adjust URL as necessary)
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'https://group12frontendserver-1bde9aa1d224.herokuapp.com/',  // Allow frontend domain (Vue app)
+    methods: ["GET", "POST"],
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
+
+// Initialize router and use it for all routes starting with '/'
 const router = require('./routes');
-//Tell index to use router for all links starting with '/'
 app.use('/', router);
 
-//Run application
+// For handling SPA (Vue Router) behavior: catch-all route to return Vue's index.html for any routes not handled by API
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist/index.html')); // Corrected path
+});
+
+// Start the HTTP server with Socket.io integrated
 const port = process.env.PORT || 3001;
-server.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+httpServer.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
 });

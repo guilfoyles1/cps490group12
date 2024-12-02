@@ -90,10 +90,13 @@ const getUser = async (req, res) => {
 };
 
 // Function to update the user's username
-const updateUsername = async (req, res) => {
+const updateUsername = async (req = null, res = null, newUsername = null) => {
     try {
-        const { newUsername } = req.body; // Get the new username from the request body
-        const userId = req.session.user.id;
+        // Check session and set userId
+        if (!req.session.user) {
+            console.log('No user!');
+        }
+        const userId = req.session.user._id;
 
         // Check if the new username already exists
         const usernameExists = await User.exists({ username: newUsername });
@@ -107,17 +110,21 @@ const updateUsername = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found!" });
         }
 
-        res.status(200).json({ success: true, updatedUser });
+        req.session.message = { type: 'success', text: 'Username updated successfully!'};
+        res.redirect('/update_user');
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
 
 // Function to update the user's email
-const updateEmail = async (req, res) => {
+const updateEmail = async (req = null, res = null, newEmail = null) => {
     try {
-        const { newEmail } = req.body; // Get the new email from the request body
-        const userId = req.session.user.id;
+        // Check session and set userId
+        if (!req.session.user) {
+            console.log('No user!');
+        }
+        const userId = req.session.user._id;
 
         // Check if the new email already exists
         if (await User.exists({ email: newEmail })) {
@@ -130,17 +137,21 @@ const updateEmail = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found!" });
         }
 
-        res.status(200).json({ success: true, updatedUser });
+        req.session.message = { type: 'success', text: 'Email updated successfully!'};
+        res.redirect('/update_user');
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
 
 // Function to update the user's password
-const updatePassword = async (req, res) => {
+const updatePassword = async (req = null, res = null, newPassword = null) => {
     try {
-        const { newPassword } = req.body; // Get the new password from the request body
-        const userId = req.session.user.id;
+        // Check session and set userId
+        if (!req.session.user) {
+            console.log('No user!');
+        }
+        const userId = req.session.user._id;
 
         // Hash the new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -151,7 +162,8 @@ const updatePassword = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found!" });
         }
 
-        res.status(200).json({ success: true, message: "Password updated successfully." });
+        req.session.message = { type: 'success', text: 'Password updated successfully!'};
+        res.redirect('/update_user');
     } catch (error) {
         res.status(500).json({ success: false, message: "Internal server error" });
     }

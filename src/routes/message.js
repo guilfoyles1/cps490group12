@@ -2,6 +2,9 @@ const router = require("express").Router();
 const Message = require('../models/message');
 const User = require('../models/users');
 const ChatRoom = require('../models/chatRoom');
+const socket = require('../config/socket');
+
+const Chat = require('../controllers/message');
 
 // router.get("/:username/chat", (req, res) => {
 //     const { username } = req.session.user.name;
@@ -9,10 +12,10 @@ const ChatRoom = require('../models/chatRoom');
 // });
 
 router.get('/new_chat', (req, res) => {
-    if (!req.session.user) { // Check if user is logged in
-        return res.redirect('/login?from=${encodeURIComponent(req.originalUrl)}'); // Redirect to login if not
+    if (!req.session.user) {
+        return res.redirect(`/login?from=${encodeURIComponent(req.originalUrl)}`); // Corrected string interpolation
     }
-    res.render('test_message');
+    res.render('new_chat');  // Changed to new_chat.pug
 });
 
 router.post('/new_chat', async (req, res) => {
@@ -29,24 +32,25 @@ router.post('/new_chat', async (req, res) => {
         return res.status(400).render('test_message', { message: 'Please enter at least one username.' });
     }
 
+    // Add current user to validUsers
+    usernames.push(currentUser.username);
     // Validate input users
     const validUsers = await User.find({ username: { $in: usernames } });
 
     if (validUsers.length != usernames.length) {
         return res.status(500).render('test_message', { message: 'Some users do not exist!' });
-    } else {
-        usernames.push(currentUser.username);
     }
 
-    const newRoom = new ChatRoom({
+    const newChat = new ChatRoom({
         name: `${usernames.join(`, `)}`,
         type: usernames.length > 2 ? 'group' : 'one_to_one',
         users: validUsers.map(user => user._id),
     });
     
     try {
-        await newChat.save();
-        res.status(200).json(newChat);
+        const savedChat = await newChat.save()
+        // Respond with the room data
+        res.status(200).json(savedChat); // Send room data to JSON
     } catch (error) {
         console.error('Error creating chat room: ', error);
         return res.status(500).render('test_message', { message: 'Error creating chat room.' });
@@ -54,8 +58,42 @@ router.post('/new_chat', async (req, res) => {
     }
 });
 
+router.get('/chat/:id', async (req, res) => {
+    try {
+        const roomId = req.params.id;
+        const chatRoom = await ChatRoom.findById(roomId).populate('users');
+
+        if (!chatRoom) {
+            return res.status(404).send('Chat room not found');
+        }
+
+        res.render('chat_room', { room: chatRoom });  // Render a new view for the chat room
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error loading chat room');
+    }
+});
+
+router.post('/chat/:id', async (req, res) => {
+    try {
+        const { newMessage } = req.body;
+        const user = req.session.user.username;
+        const roomId = req.params.id;
+        const roomChat = await ChatRoom.findOneById({ roomId });
+
+        await Chat.sendMessage(roomChat._id, user, newMessage);
+
+        res.status(200).json({ success: true, message: 'Message sent!' });
+    } catch {
+        console.error('Error sending message: ', error);
+        res.status(500).json({ error: 'Failed to send.' });
+    }
+});
+
+
 router.get('/global', async (req, res) => {
     try {
+        const currentUser = req.session.user;
         // Check if a global chat room already exists
         let globalChatRoom = await ChatRoom.findOne({ type: 'global' }).populate('messages.sender');
 
@@ -74,10 +112,31 @@ router.get('/global', async (req, res) => {
         const messages = globalChatRoom.messages;
 
         // Render the global chat page, passing the messages
+
+        // Check logged-in
+        if (!currentUser) {
+            return res.redirect('/login');
+        }
+
         res.render('global', { messages });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error loading global chat');
+    }
+});
+
+router.post('/global', async (req, res) => {
+    try {
+        const { newMessage } = req.body;
+        const user = req.session.user.username;
+        const globalChat = await ChatRoom.findOne({ type: 'global' });
+
+        await Chat.sendMessage(globalChat._id, user, newMessage);
+
+        res.status(200).json({ success: true, message: 'Message sent!' });
+    } catch {
+        console.error('Error sending message: ', error);
+        res.status(500).json({ error: 'Failed to send.' });
     }
 });
 

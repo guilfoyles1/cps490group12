@@ -10,9 +10,10 @@
     background-color: #b3d9ff; 
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
     color: #333;
+    margin: 0; 
   }
   
   /* Container for centering content */
