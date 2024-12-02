@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
 });
 
 // Tell routes.js to use accounts.js for handling user account info
-router.use('/', userRouter)
+router.use('/', userRouter);
 
 // Adds middleware to check if user is authenticated for chat routes
 router.use('/chat', (req, res, next) => {

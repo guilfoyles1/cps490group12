@@ -35,6 +35,11 @@ const pubClient = createClient({
 });
 const subClient = pubClient.duplicate();
 
+// Add error handlers
+pubClient.on('error', (err) => console.error('Redis pubClient error:', err));
+subClient.on('error', (err) => console.error('Redis subClient error:', err));
+
+// Connect Redis clients
 pubClient.connect().catch(console.error);
 subClient.connect().catch(console.error);
 
