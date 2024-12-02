@@ -1,13 +1,59 @@
+doctype html
 html
-    head
-        title Chat Room
-        link(href="/styles.css" type="text/css" rel="stylesheet")
-    body
-        h1 Chat Room: #{room.name}
-        ul#messages
-            each message in room.messages
-                li= message.text
-        form#send-message
-            input(type="text" id="message" placeholder="Type your message...")
-            button(type="submit") Send Message
-        script(src="/js/chat.js")
+  head
+    title Chat Room - #{room.name}
+    link(rel="stylesheet", href="/styles.css")
+    script(src="/socket.io/socket.io.js") // Import socket.io
+  body
+    .chat-container
+      h1 Chat Room: #{room.name}
+
+      .chat-box#chatWindow
+        ul#message-list
+          each message in messages
+            li.message-item
+              .message-sender #{message.sender}:
+              .message-content #{message.message}
+
+      .chat-input
+        form#message-form
+          input#message-input(type="text" placeholder="Enter your message" required)
+          .button-container
+            button(type="submit") Send
+            button(type="button" onClick="window.location.href = '/'") Home
+
+    // JavaScript for real-time chat functionality
+    script.
+      document.addEventListener('DOMContentLoaded', () => {
+        const socket = io();
+
+        // Set the username from the session
+        socket.emit('set username', "#{username}");
+
+        // Join the chat room
+        const roomId = "#{room._id}";
+        socket.emit('join room', roomId);
+
+        // Listen for private messages
+        socket.on('private message', ({ content, from }) => {
+          const messageList = document.getElementById('message-list');
+          const messageItem = document.createElement('li');
+          messageItem.className = 'message-item';
+          messageItem.innerHTML = `<span class="message-sender">${from}:</span> <span class="message-content">${content}</span>`;
+          messageList.appendChild(messageItem);
+
+          // Scroll to the bottom
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+        });
+
+        // Handle sending a message
+        const messageForm = document.getElementById('message-form');
+        messageForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const messageInput = document.getElementById('message-input');
+          const message = messageInput.value;
+
+          socket.emit('private message', { content: message, room: roomId });
+          messageInput.value = '';
+        });
+      });

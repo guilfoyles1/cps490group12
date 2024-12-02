@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Message = require("../models/message"); // Import the message model
+const Message = require("./message"); // Import the message model
 
 
 const ChatRoomSchema = new mongoose.Schema(
