@@ -151,4 +151,4 @@ The following are planned improvements and features for future releases:
 ## Screenshots
 
 ### Homepage After Logging In
-![Homepage](./screenshots/homepage.png)
+![Homepage](HomePage.png)
