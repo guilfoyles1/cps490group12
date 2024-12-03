@@ -10,6 +10,7 @@ const { createClient } = require("redis");
 const { createAdapter } = require("@socket.io/redis-adapter");
 const bcrypt = require('bcrypt');
 const sharedSession = require('express-socket.io-session');
+const FeedPost = require('./models/feedPost'); // Add this at the top
 
 // Load environment variables from .env file
 require("dotenv").config();
@@ -127,10 +128,7 @@ app.post('/chat/new', isAuthenticated, async (req, res) => {
       });
     }
 
-    let recipientList = recipients
-    .split(',')
-    .map(r => r.trim()) // Trim each recipient
-    .filter(r => r && r !== currentUser.username); // Exclude empty or self-names  
+    let recipientList = recipients.split(',').map(r => r.trim()).filter(r => r !== currentUser.username);
 
     if (recipientList.length === 0) {
       return res.render('chat_room_list', {
@@ -231,6 +229,48 @@ app.get('/chat/:id', isAuthenticated, async (req, res) => {
 io.use(sharedSession(sessionMiddleware, {
   autoSave: true,
 }));
+
+app.get('/global', isAuthenticated, async (req, res) => {
+  try {
+    const posts = await FeedPost.find().sort({ createdAt: -1 }); // Fetch posts in descending order
+    res.render('global', {
+      username: req.session.user.username,
+      posts, // Pass posts to the template
+    });
+  } catch (err) {
+    console.error('Error loading global page:', err);
+    res.status(500).send('Error loading the global page.');
+  }
+});
+
+app.post('/global', isAuthenticated, async (req, res) => {
+  try {
+    const { content } = req.body;
+
+    if (!content || content.trim() === '') {
+      return res.status(400).send('Post content cannot be empty.');
+    }
+
+    const post = new FeedPost({
+      content,
+      author: req.session.user.username,
+    });
+
+    await post.save();
+
+    // Notify all connected clients about the new post
+    io.to('global').emit('newPost', {
+      content: post.content,
+      author: post.author,
+      createdAt: post.createdAt,
+    });
+
+    res.redirect('/global');
+  } catch (err) {
+    console.error('Error creating post:', err);
+    res.status(500).send('Error creating the post.');
+  }
+});
 
 // Socket.IO Handlers for Direct and Group Messages
 io.on('connection', (socket) => {
