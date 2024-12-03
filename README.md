@@ -151,4 +151,13 @@ The following are planned improvements and features for future releases:
 ## Screenshots
 
 ### Homepage After Logging In
-![Homepage](HomePage.png)
+![Homepage](figures/HomePage.png)
+
+### Protected Page After Clicking Account Button
+![Account](figures/Account_ProtectedPage.png)
+
+### Chat Page After Clicking Chats
+![Chat](figures/ChatPage.png)
+
+### Chat Room After Creating Chat
+![Chatroom](figures/ChatRoom.png)
