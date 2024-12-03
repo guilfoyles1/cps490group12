@@ -127,7 +127,10 @@ app.post('/chat/new', isAuthenticated, async (req, res) => {
       });
     }
 
-    let recipientList = recipients.split(',').map(r => r.trim()).filter(r => r !== currentUser.username);
+    let recipientList = recipients
+    .split(',')
+    .map(r => r.trim()) // Trim each recipient
+    .filter(r => r && r !== currentUser.username); // Exclude empty or self-names  
 
     if (recipientList.length === 0) {
       return res.render('chat_room_list', {

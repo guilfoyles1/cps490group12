@@ -5,19 +5,16 @@ html
     body
         .container
             header
-                h1(style="color:purple") CPS 490 Group 12
-                h3(style="color:purple; font-size: 0.9rem; margin-top: 10px;") By: Abby Foppe, Shay Guilfoyles, Paras Rajan, Zach Spears
+                h1 Messenger Application
 
             main
-                h4(style="color:blue;font-size: 0.7rem;margin-top: 20px;font-style: italic;") This is a test page created until the project is furthered.
-                br
                 if (!isLoggedIn)
                     // Signup Button
                     button(type="button" style="margin-right: 10px;" onClick="window.location.href = '/signup';") Signup
                     // Login Button
                     button(type="button" onClick="window.location.href = '/login';") Login
                 else
-                    h4(style="color:blue") Welcome back #{username}!
+                    h4(style="color:black") Welcome back #{username}!
                     // Account Button
                     button(type="button" style="margin-right: 10px;margin-top: 20px;" onClick="window.location.href = '/protected_page';") Account
                     // Chats Button
@@ -27,46 +24,3 @@ html
                     // Logout Button
                     button(type="button" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;" onClick="window.location.href = '/logout';") Logout
 
-            //-     // Display the chat if the user is logged in
-            //-     if user
-            //-         #global-chat
-            //-             h4 Chat Room
-            //-             div#chat-box
-            //-                 div#messages
-            //-                 input#message-input(type="text" placeholder="Type a message...")
-            //-                 button#send-message Send Message
-            //-     else
-            //-         p You must be logged in to chat.
-
-            //- script(src="/socket.io/socket.io.js")
-            //- script.
-            //-     const socket = io(); // Initialize socket connection
-
-            //-     // Check if user is logged in and inject username if so
-            //-     const user = !{user ? JSON.stringify(user) : 'null'}; // Inject user info from Express
-
-            //-     socket.on('connect', () => {
-            //-         console.log('Connected to server via Socket.IO');
-            //-     });
-
-            //-     // Listen for the "send" button click
-            //-     document.getElementById('send-message')?.addEventListener('click', function() {
-            //-         var messageInput = document.getElementById('message-input');
-            //-         var message = messageInput.value;
-
-            //-         if (message.trim() && user) {
-            //-             // Emit the message only if logged in
-            //-             socket.emit('sendMessage', { user: user.username, message: message });
-            //-             messageInput.value = ''; // Clear the input
-            //-         } else {
-            //-             alert('You must be logged in to send a message');
-            //-         }
-            //-     });
-
-            //-     // Listen for incoming messages
-            //-     socket.on('newMessage', function(data) {
-            //-         var messagesDiv = document.getElementById('messages');
-            //-         var newMessage = document.createElement('p');
-            //-         newMessage.textContent = `${data.sender}: ${data.message}`;
-            //-         messagesDiv.appendChild(newMessage);
-            //-     });
