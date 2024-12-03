@@ -161,3 +161,9 @@ The following are planned improvements and features for future releases:
 
 ### Chat Room After Creating Chat
 ![Chatroom](figures/ChatRoom.png)
+
+### Post Feed After Clicking Open Chat
+![Posts](figures/PostFeed.png)
+
+### Update Page After Clicking Update User Info
+![Update](figures/UpdateInfo.png)
