@@ -1,71 +1,49 @@
 html
   head
-    title Global Chat
-    llink(rel="stylesheet", href="/styles.css")
+    title Global Feed
+    link(rel="stylesheet", href="/styles.css")
 
-block content
-    .container     
-        h1 Global Chat
+  block content
+    .container
+      h1 Welcome to the Global Posts Page
+      p Logged in as #{username}
 
-        // Global Chat box
-        .chat-box
-            textarea#chat-text-box(readonly rows="20" cols="36")
-                each message in messages
-                    if message.sender
-                        p= `${message.sender.username}: ${message.message}`
-                    else
-                        p= `Anonymous: ${message.message}`
+      // Home button
+      button(type="button" onClick = "window.location.href = '/';") Home
+      br
+      br
 
-        // Chat input form
-        form#chat-form
-            input#message-input(type="text" placeholder="Type a message" required)
-            button(type="submit") Send
-        
-        // Enable socket.io and handle message updates
-        script(src="/socket.io/socket.io.js")
-        script.
-            const socket = io(); // Connect to the server's socket
-            const currentUser = `#{username}`;
-            const room = 'global';
+      // Form to create a new post
+      form#post-form(action="/global" method="POST")
+        textarea#post-content(name="content" placeholder="Share something..." required)
+        button(type="submit") Post
+        br
 
-            // Join the global chat room on connect
-            socket.on('connect') => {
-                socket.emit('join', (room, currentUser));
-            };
+      // Feed posts area
+      h2 Post Feed
+      .feed
+        if posts.length > 0
+          each post in posts
+            .post
+              p.author #{post.author} at #{post.createdAt.toLocaleString()}
+              p.content #{post.content}
+        else
+          p No posts available. Start the conversation!
 
-            // Leave the global chat room on disconnect
-            socket.on('disconnect') => {
-                socket.emit('leave', (room, currentUser));
-            };
+      // Add Socket.IO script for real-time updates
+      script(src="/socket.io/socket.io.js")
+      script.
+        document.addEventListener('DOMContentLoaded', () => {
+          const socket = io();
+          const feed = document.querySelector('.feed');
 
-
-            // Listen for new messages
-            socket.on('newMessage', (message) => {
-                const chatBox = document.getElementById('chat-text-box');
-                chatBox.value += `${message.sender}: ${message.message}\n`;
-                chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
-            });
-
-            // Handle sending new messages
-            const form = document.getElementById('chat-form');
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const messageInput = document.getElementById('message-input');
-                const message = messageInput.value;
-                if (message) {
-                    fetch('/global', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ newMessage: message }),
-                    })
-                    .then(response => response.json())
-                    .then((data) => {
-                        if (data.success) {
-                            messageInput.value = ''; // Clear input on success
-                        } else {
-                            alert('Failed to send message.');
-                        }
-                    })
-                    .catch((err) => console.error('Error:', err));
-                }
-            });
+          socket.on('newPost', (post) => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `
+              <p class="author">${post.author} at ${new Date(post.createdAt).toLocaleString()}</p>
+              <p class="content">${post.content}</p>
+            `;
+            feed.prepend(postElement); // Add new post to the top
+          });
+        });
